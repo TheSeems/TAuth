@@ -40,38 +40,19 @@ class BalancerTest {
     }
 
     @Test
-    void caseOne() {
-        if (balancer == null)
-            return;
+    void simpleBalancerTest() {
+        balancer = new SimpleBalancer(Arrays.asList("first", "second", "third"));
         servers.put("first", 1213);
         servers.put("second", 312);
         servers.put("third", 32);
         servers.put("unknown", 0);
         assertEquals("third", balancer.getServer(null));
-    }
 
-    @Test
-    void caseTwo() {
-        if (balancer == null)
-            return;
         servers.put("third", 500);
         assertEquals("second", balancer.getServer(null));
+
         servers.clear();
-    }
-
-    @Test
-    void caseThree() {
-        if (balancer == null)
-            return;
         assertNotNull(balancer.getServer(null));
-    }
-
-    @Test
-    void simpleBalancerTest() {
-        balancer = new SimpleBalancer(Arrays.asList("first", "second", "third"));
-        caseOne();
-        caseTwo();
-        caseThree();
     }
 
     @Test

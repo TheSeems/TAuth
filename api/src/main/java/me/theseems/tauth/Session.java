@@ -1,7 +1,6 @@
 package me.theseems.tauth;
 
 import java.util.Date;
-import java.util.UUID;
 
 public interface Session {
     /**
