@@ -16,4 +16,12 @@ public interface AuthServer {
      * @return result
      */
     boolean isOnline(UUID player);
+
+    /**
+     * Get server online
+     *
+     * @param server target
+     * @return players online count
+     */
+    int getOnline(String server);
 }

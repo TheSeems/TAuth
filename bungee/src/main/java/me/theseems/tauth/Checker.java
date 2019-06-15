@@ -4,101 +4,109 @@ import me.theseems.tauth.utils.BungeeTitle;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class Checker implements Runnable {
-    public static void display(UUID uuid, RegisterResponse response) {
+    private static Set<UUID> duplicate;
+
+    Checker() {
+        duplicate = new HashSet<>();
+    }
+
+    public static void display(UUID uuid, RegisterResponse response, Boolean... args) {
+        if (args.length == 0)
+            duplicate.add(uuid);
+
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
+        String title, subtitle = null;
         switch (response) {
             case REGISTERED:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("Already registered"))
-                                .subTitle(new TextComponent()));
+                title = "Already registered";
                 break;
 
             case INCORRECT:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("How that even happened?"))
-                                .subTitle(new TextComponent()));
+                title = "Contact developer";
+                subtitle = "seemsthe@gmail.com";
                 break;
 
             case OK:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("Registered :)"))
-                                .subTitle(new TextComponent()));
+                title = "You are registered";
                 break;
 
             default:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent(response.name()))
-                                .subTitle(new TextComponent()));
+                title = response.name();
                 break;
         }
+
+        player.sendTitle(
+                new BungeeTitle()
+                        .title(new TextComponent(title))
+                        .subTitle(new TextComponent(subtitle == null ? "" : subtitle))
+        );
     }
 
-    public static void display(UUID uuid, LoginResponse response) {
+    public static void display(UUID uuid, LoginResponse response, Boolean... args) {
+        if (args.length == 0)
+            duplicate.add(uuid);
+
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
+        String title = null, subtitle = null;
         switch (response) {
             case UNREGISTERED:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("Register"))
-                                .subTitle(new TextComponent("/register <pass> <pass>")));
+                title = "Please, register";
+                subtitle = "/register <pass> <pass>";
                 break;
 
             case INCORRECT:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("How that even happened?"))
-                                .subTitle(new TextComponent()));
+                title = "Contact developer";
+                subtitle = "seemsthe@gmail.com";
                 break;
 
             case OK:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("Logined :)"))
-                                .subTitle(new TextComponent())
-                                .stay(20));
+                title = "You are logged in";
                 break;
 
             case EXPIRED:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("Please, log in"))
-                                .subTitle(new TextComponent("/login <pass>")));
+                title = "Please, log in";
+                subtitle = "/login <pass>";
                 break;
 
             case FORBIDDEN:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent("Wrong password"))
-                                .subTitle(new TextComponent()));
+                subtitle = "Wrong password";
                 break;
 
             default:
-                player.sendTitle(
-                        new BungeeTitle()
-                                .title(new TextComponent(response.name()))
-                                .subTitle(new TextComponent()));
+                title = response.name();
                 break;
         }
+
+        player.sendTitle(
+                new BungeeTitle()
+                        .title(new TextComponent(title != null ? title : ""))
+                        .subTitle(new TextComponent(subtitle != null ? subtitle : ""))
+                        .stay(10)
+        );
     }
 
     @Override
     public void run() {
         for (ProxiedPlayer player : Main.getServer().getPlayers()) {
-            LoginResponse response = TAuth.getAuthManager().isAutheticated(player.getUniqueId());
+            if (duplicate.contains(player.getUniqueId())) {
+                duplicate.remove(player.getUniqueId());
+                continue;
+            }
+
+            LoginResponse response = TAuth.getManager().isAutheticated(player.getUniqueId());
             if (response != LoginResponse.OK) {
+
                 if (!TAuth.getSettings().getAuthServers().contains(player.getServer().getInfo().getName()))
                     player.connect(Main.getServer().getServerInfo(
-                            TAuth.getSettings().getAuthServers().get(0)
+                            TAuth.getAuthBalancer().getServer(player.getUniqueId())
                     ));
 
-                display(player.getUniqueId(), response);
+                display(player.getUniqueId(), response, true);
             }
         }
     }

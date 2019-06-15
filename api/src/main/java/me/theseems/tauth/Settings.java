@@ -16,8 +16,8 @@ public interface Settings {
     long getExpireMils();
 
     /**
-     * Get next server
-     * @return next server
+     * Get next servers
+     * @return next servers
      */
-    String getNextServer();
+    List<String> getNextServers();
 }

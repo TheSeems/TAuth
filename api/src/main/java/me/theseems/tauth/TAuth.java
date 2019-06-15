@@ -3,9 +3,12 @@ package me.theseems.tauth;
 public class TAuth {
     private static AuthDB db;
     private static AuthHasher hasher;
-    private static AuthManager authManager;
-    private static AuthServer authServer;
+    private static AuthManager manager;
+    private static AuthServer server;
     private static Settings settings;
+
+    private static AuthBalancer authBalancer;
+    private static AuthBalancer nextBalancer;
 
     public TAuth() {
     }
@@ -26,20 +29,20 @@ public class TAuth {
         TAuth.hasher = hasher;
     }
 
-    public static AuthManager getAuthManager() {
-        return authManager;
+    public static AuthManager getManager() {
+        return manager;
     }
 
-    public static void setAuthManager(AuthManager authManager) {
-        TAuth.authManager = authManager;
+    public static void setManager(AuthManager manager) {
+        TAuth.manager = manager;
     }
 
-    public static AuthServer getAuthServer() {
-        return authServer;
+    public static AuthServer getServer() {
+        return server;
     }
 
-    public static void setAuthServer(AuthServer authServer) {
-        TAuth.authServer = authServer;
+    public static void setServer(AuthServer server) {
+        TAuth.server = server;
     }
 
     public static Settings getSettings() {
@@ -48,5 +51,21 @@ public class TAuth {
 
     public static void setSettings(Settings settings) {
         TAuth.settings = settings;
+    }
+
+    public static AuthBalancer getAuthBalancer() {
+        return authBalancer;
+    }
+
+    public static void setAuthBalancer(AuthBalancer authBalancer) {
+        TAuth.authBalancer = authBalancer;
+    }
+
+    public static AuthBalancer getNextBalancer() {
+        return nextBalancer;
+    }
+
+    public static void setNextBalancer(AuthBalancer nextBalancer) {
+        TAuth.nextBalancer = nextBalancer;
     }
 }

@@ -16,7 +16,7 @@ public class RegisterCommand extends Command {
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
         UUID player = Main.getServer().getPlayer(commandSender.getName()).getUniqueId();
-        LoginResponse response = TAuth.getAuthManager().isAutheticated(player);
+        LoginResponse response = TAuth.getManager().isAutheticated(player);
         if (response != LoginResponse.UNREGISTERED) {
             Checker.display(player, response);
             return;
@@ -29,17 +29,16 @@ public class RegisterCommand extends Command {
         } else {
             String hash = strings[0];
             hash = TAuth.getHasher().hash(hash);
-            RegisterResponse registerResponse = TAuth.getAuthManager().register(player, hash);
+            RegisterResponse registerResponse = TAuth.getManager().register(player, hash);
+
             if (registerResponse == RegisterResponse.OK) {
-                TAuth.getAuthManager().autoLogin(player);
                 Main.getServer()
                         .getPluginManager()
                         .callEvent(new TLoginEvent(
-                                Main.getServer().getPlayer(player)
+                                Main.getServer().getPlayer(player), false
                         ));
+                Checker.display(player, registerResponse);
             }
-
-            Checker.display(player, registerResponse);
 
         }
     }
