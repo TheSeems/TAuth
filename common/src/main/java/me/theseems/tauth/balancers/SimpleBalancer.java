@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class SimpleBalancer implements AuthBalancer {
-    String balanced;
-    List<String> servers;
+    public String balanced;
+    public List<String> servers;
 
     public SimpleBalancer(List<String> servers) {
         this.servers = servers;
@@ -20,7 +20,7 @@ public class SimpleBalancer implements AuthBalancer {
         return balanced;
     }
 
-    void update() {
+    public void update() {
         balanced = servers.get(0);
         int lowest = TAuth.getServer().getOnline(servers.get(0));
         for (String auth : servers) {

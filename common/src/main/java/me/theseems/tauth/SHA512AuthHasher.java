@@ -33,7 +33,7 @@ public class SHA512AuthHasher implements AuthHasher {
 
         // For specifying wrong message digest algorithms
         catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

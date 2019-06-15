@@ -10,9 +10,6 @@ public class TAuth {
     private static AuthBalancer authBalancer;
     private static AuthBalancer nextBalancer;
 
-    public TAuth() {
-    }
-
     public static AuthDB getDb() {
         return db;
     }

@@ -9,18 +9,16 @@ import java.util.Set;
 import java.util.UUID;
 
 public class Checker implements Runnable {
-    private static Set<UUID> duplicate;
-
-    Checker() {
-        duplicate = new HashSet<>();
-    }
+    private static Set<UUID> duplicate = new HashSet<>();
 
     public static void display(UUID uuid, RegisterResponse response, Boolean... args) {
         if (args.length == 0)
             duplicate.add(uuid);
 
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
-        String title, subtitle = null;
+        String title;
+        String subtitle = null;
+
         switch (response) {
             case REGISTERED:
                 title = "Already registered";
@@ -52,7 +50,9 @@ public class Checker implements Runnable {
             duplicate.add(uuid);
 
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
-        String title = null, subtitle = null;
+        String title = null;
+        String subtitle = null;
+
         switch (response) {
             case UNREGISTERED:
                 title = "Please, register";

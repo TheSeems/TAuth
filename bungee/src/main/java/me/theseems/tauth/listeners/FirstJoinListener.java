@@ -15,12 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class FirstJoinListener implements Listener {
-
-    private static Set<UUID> players;
-
-    public FirstJoinListener() {
-        players = new HashSet<>();
-    }
+    private static Set<UUID> players = new HashSet<>();
 
     static void add(UUID player) {
         players.add(player);
