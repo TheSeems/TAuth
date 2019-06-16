@@ -34,8 +34,8 @@ auth:
 next:
   - instance
 
-# 2 hours
-expire: 7200000
+# 2 hours (in seconds)
+expire: 7200
 
 # 5 seconds for bungee checker
 checker_period: 5000
