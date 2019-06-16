@@ -1,4 +1,8 @@
 # TAuth
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5263b39af61a4d40b5ff09463a684b72)](https://app.codacy.com/app/TheSeems/TAuth?utm_source=github.com&utm_medium=referral&utm_content=TheSeems/TAuth&utm_campaign=Badge_Grade_Dashboard)
+[![Build Status](https://travis-ci.com/TheSeems/TAuth.svg?branch=master)](https://travis-ci.com/TheSeems/TAuth)
+
 Simple auth sysytem in minecraft
 
 ## Session system
