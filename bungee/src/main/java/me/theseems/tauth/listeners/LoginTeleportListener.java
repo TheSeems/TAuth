@@ -19,7 +19,7 @@ public class LoginTeleportListener implements Listener {
         if (TAuth.getManager().isAutheticated(player) != LoginResponse.OK) {
             Checker.display(player, TAuth.getManager().isAutheticated(player));
 
-            if (e.getPlayer().getServer() == null)
+            if (e.getPlayer().getServer() == null || !TAuth.getSettings().getAuthServers().contains(e.getPlayer().getServer().getInfo().getName()))
                 e.setTarget(
                         Main.getServer()
                                 .getServerInfo(TAuth.getAuthBalancer().getServer(player))

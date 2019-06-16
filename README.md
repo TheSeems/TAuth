@@ -20,7 +20,24 @@ For example, MongoDB storage support or even support of any proxy (implement Aut
  - /register <pass> <repeat-pass>
  - /logout
  
+ ## Config
+ ```yaml
+# Auth server pool
+auth:
+  - limbo
+
+# Next server pool (remove to disable)
+next:
+  - instance
+
+# 2 hours
+expire: 7200000
+
+# 5 seconds for bungee checker
+checker_period: 5000
+```
+ 
  ## TODO
-  - Configs
+  - Localization (custom messages)
   - Support for PostgreSQL, MySQL
   - Other kinds of login/register (2 factor auth, register from social networks)

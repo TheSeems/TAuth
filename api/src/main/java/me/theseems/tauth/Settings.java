@@ -13,7 +13,7 @@ public interface Settings {
      * Get mils before player's session expired
      * @return mils
      */
-    long getExpireMils();
+    Integer getExpireMils();
 
     /**
      * Get next servers

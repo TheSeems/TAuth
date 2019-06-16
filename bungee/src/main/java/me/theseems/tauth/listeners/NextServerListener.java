@@ -15,13 +15,10 @@ public class NextServerListener implements Listener {
         UUID uuid = e.getPlayer().getUniqueId();
         FirstJoinListener.add(uuid);
 
-        if (e.getPlayer().getServer() == null)
-            return;
-
         ServerInfo info = Main.getServer()
                 .getServerInfo(TAuth.getNextBalancer().getServer(uuid));
 
-        if (!e.getPlayer().getServer().getInfo().getName().equals(info.getName()))
+        if (e.getPlayer().getServer() == null || !e.getPlayer().getServer().getInfo().getName().equals(info.getName()))
             e.getPlayer().connect(info);
     }
 }

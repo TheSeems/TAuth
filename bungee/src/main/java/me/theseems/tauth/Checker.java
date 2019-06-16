@@ -11,10 +11,7 @@ import java.util.UUID;
 public class Checker implements Runnable {
     private static Set<UUID> duplicate = new HashSet<>();
 
-    public static void display(UUID uuid, RegisterResponse response, Boolean... args) {
-        if (args.length == 0)
-            duplicate.add(uuid);
-
+    private static void displayLocal(UUID uuid, RegisterResponse response) {
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
         String title;
         String subtitle = null;
@@ -45,9 +42,8 @@ public class Checker implements Runnable {
         );
     }
 
-    public static void display(UUID uuid, LoginResponse response, Boolean... args) {
-        if (args.length == 0)
-            duplicate.add(uuid);
+    private static void displayLocal(UUID uuid, LoginResponse response) {
+        duplicate.add(uuid);
 
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
         String title = null;
@@ -90,6 +86,16 @@ public class Checker implements Runnable {
         );
     }
 
+    public static void display(UUID uuid, RegisterResponse response) {
+        duplicate.add(uuid);
+        displayLocal(uuid, response);
+    }
+
+    public static void display(UUID uuid, LoginResponse response) {
+        duplicate.add(uuid);
+        displayLocal(uuid, response);
+    }
+
     @Override
     public void run() {
         for (ProxiedPlayer player : Main.getServer().getPlayers()) {
@@ -100,13 +106,10 @@ public class Checker implements Runnable {
 
             LoginResponse response = TAuth.getManager().isAutheticated(player.getUniqueId());
             if (response != LoginResponse.OK) {
-
-                if (!TAuth.getSettings().getAuthServers().contains(player.getServer().getInfo().getName()))
-                    player.connect(Main.getServer().getServerInfo(
-                            TAuth.getAuthBalancer().getServer(player.getUniqueId())
-                    ));
-
-                display(player.getUniqueId(), response, true);
+                player.connect(Main.getServer().getServerInfo(
+                        TAuth.getAuthBalancer().getServer(player.getUniqueId())
+                ));
+                displayLocal(player.getUniqueId(), response);
             }
         }
     }
