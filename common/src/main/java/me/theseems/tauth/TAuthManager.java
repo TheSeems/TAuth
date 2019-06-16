@@ -1,5 +1,6 @@
 package me.theseems.tauth;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -67,8 +68,10 @@ public class TAuthManager implements AuthManager {
 
     @Override
     public void updateSession(UUID player) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, TAuth.getSettings().getExpireSeconds());
         TAuth.getDb().setSession(player, new TSession(
-                new Date(System.currentTimeMillis() + TAuth.getSettings().getExpireMils()),
+                calendar.getTime(),
                 TAuth.getServer().getIp(player)
         ));
     }

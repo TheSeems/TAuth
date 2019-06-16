@@ -74,8 +74,8 @@ public class YamlSettings implements BungeeSettings {
     }
 
     @Override
-    public Integer getExpireMils() {
-        return getOrDefault(Integer.class, "expire", 2 * 3600 * 1000);
+    public Integer getExpireSeconds() {
+        return getOrDefault(Integer.class, "expire", 2 * 3600);
     }
 
     @Override

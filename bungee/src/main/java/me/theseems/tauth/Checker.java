@@ -82,7 +82,7 @@ public class Checker implements Runnable {
                 new BungeeTitle()
                         .title(new TextComponent(title != null ? title : ""))
                         .subTitle(new TextComponent(subtitle != null ? subtitle : ""))
-                        .stay(10)
+                        .stay(15)
         );
     }
 

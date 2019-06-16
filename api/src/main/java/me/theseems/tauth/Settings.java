@@ -10,10 +10,10 @@ public interface Settings {
     List<String> getAuthServers();
 
     /**
-     * Get mils before player's session expired
-     * @return mils
+     * Get seconds before player's session expired
+     * @return seconds
      */
-    Integer getExpireMils();
+    Integer getExpireSeconds();
 
     /**
      * Get next servers

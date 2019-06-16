@@ -7,7 +7,7 @@ next:
   - instance
 
 # 2 hours
-expire: 7200000
+expire: 7200
 
 # 5 seconds for bungee checker
 checker_period: 5000

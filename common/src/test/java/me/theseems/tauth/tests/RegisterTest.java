@@ -21,7 +21,7 @@ class RegisterTest {
             }
 
             @Override
-            public Integer getExpireMils() {
+            public Integer getExpireSeconds() {
                 return 24 * 1000;
             }
 
