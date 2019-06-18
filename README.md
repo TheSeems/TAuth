@@ -100,7 +100,7 @@ messages:
 # Session expire seconds
 expire: 7200
 
-# Non-authorized player lifetime before kick
+# Non-authorized player lifetime before kick in seconds
 kick_period: 30
 ```
  
