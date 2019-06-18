@@ -1,15 +1,21 @@
 package me.theseems.tauth;
 
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-public class BungeeAuthServer implements AuthServer {
+public class BungeeAuthServer implements AuthServer, Runnable {
     private ProxyServer server;
+    private Map<String, Integer> online;
 
-    public BungeeAuthServer(ProxyServer server) {
-        this.server = server;
+    public BungeeAuthServer(Plugin plugin) {
+        online = new HashMap<>();
+        this.server = plugin.getProxy();
+        server.getScheduler().schedule(plugin, this, 0, Main.getBungeeSettings().getServerPeriod(), TimeUnit.SECONDS);
     }
 
     @Override
@@ -24,10 +30,19 @@ public class BungeeAuthServer implements AuthServer {
 
     @Override
     public int getOnline(String server) {
-        ServerInfo info = this.server.getServerInfo(server);
-        if (info == null)
-            return Integer.MAX_VALUE;
-        else
-            return info.getPlayers().size();
+        return online.getOrDefault(server, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public void run() {
+        // Testing each server
+        server.getConfig().getServers().forEach((s, serverInfo) -> serverInfo.ping((serverPing, throwable) -> {
+            if (throwable == null)
+                online.put(serverInfo.getName(), serverPing.getPlayers().getOnline());
+            else {
+                System.err.println("Error pinging server " + serverInfo.getName() + " => " + throwable.getLocalizedMessage());
+                online.remove(serverInfo.getName());
+            }
+        }));
     }
 }

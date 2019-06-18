@@ -26,7 +26,9 @@ public class LoginCommand extends Command {
         }
 
         if (strings.length < 1) {
-            commandSender.sendMessage(new TextComponent("Enter password.. /login <pass>"));
+            commandSender.sendMessage(new TextComponent(
+                    Main.getBungeeSettings().getMessage("login.usage")
+            ));
         } else {
             String hash = strings[0];
             hash = TAuth.getHasher().hash(hash);

@@ -52,7 +52,7 @@ public class Main extends Plugin {
         TAuth.setDb(new MemAuthDB());
         TAuth.setHasher(new SHA512AuthHasher());
         TAuth.setManager(new TAuthManager());
-        TAuth.setServer(new BungeeAuthServer(server));
+        TAuth.setServer(new BungeeAuthServer(this));
         TAuth.setSettings(bungeeSettings);
 
         TAuth.setAuthBalancer(new SimpleBalancer(bungeeSettings.getAuthServers()));

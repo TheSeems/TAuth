@@ -23,9 +23,13 @@ public class RegisterCommand extends Command {
         }
 
         if (strings.length < 2) {
-            commandSender.sendMessage(new TextComponent("Usage: /register <pass> <pass>"));
+            commandSender.sendMessage(new TextComponent(
+                    Main.getBungeeSettings().getMessage("register.usage")
+            ));
         } else if (!strings[0].equals(strings[1])) {
-            commandSender.sendMessage(new TextComponent("Passwords do not match"));
+            commandSender.sendMessage(new TextComponent(
+                    Main.getBungeeSettings().getMessage("register.no_match")
+            ));
         } else {
             String hash = strings[0];
             hash = TAuth.getHasher().hash(hash);

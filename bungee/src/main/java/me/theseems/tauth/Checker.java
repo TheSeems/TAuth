@@ -1,88 +1,25 @@
 package me.theseems.tauth;
 
-import me.theseems.tauth.utils.BungeeTitle;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Checker implements Runnable {
     private static Set<UUID> duplicate = new HashSet<>();
+    private static Map<UUID, Date> joined = new HashMap<>();
 
     private static void displayLocal(UUID uuid, RegisterResponse response) {
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
-        String title;
-        String subtitle = null;
-
-        switch (response) {
-            case REGISTERED:
-                title = "Already registered";
-                break;
-
-            case INCORRECT:
-                title = "Contact developer";
-                subtitle = "seemsthe@gmail.com";
-                break;
-
-            case OK:
-                title = "You are registered";
-                break;
-
-            default:
-                title = response.name();
-                break;
-        }
-
         player.sendTitle(
-                new BungeeTitle()
-                        .title(new TextComponent(title))
-                        .subTitle(new TextComponent(subtitle == null ? "" : subtitle))
+                Main.getBungeeSettings().getTitle("register.titles." + response.name())
         );
     }
 
     private static void displayLocal(UUID uuid, LoginResponse response) {
-        duplicate.add(uuid);
-
         ProxiedPlayer player = Main.getServer().getPlayer(uuid);
-        String title = null;
-        String subtitle = null;
-
-        switch (response) {
-            case UNREGISTERED:
-                title = "Please, register";
-                subtitle = "/register <pass> <pass>";
-                break;
-
-            case INCORRECT:
-                title = "Contact developer";
-                subtitle = "seemsthe@gmail.com";
-                break;
-
-            case OK:
-                title = "You are logged in";
-                break;
-
-            case EXPIRED:
-                title = "Please, log in";
-                subtitle = "/login <pass>";
-                break;
-
-            case FORBIDDEN:
-                subtitle = "Wrong password";
-                break;
-
-            default:
-                title = response.name();
-                break;
-        }
-
         player.sendTitle(
-                new BungeeTitle()
-                        .title(new TextComponent(title != null ? title : ""))
-                        .subTitle(new TextComponent(subtitle != null ? subtitle : ""))
-                        .stay(15)
+                Main.getBungeeSettings().getTitle("login.titles." + response.name())
         );
     }
 
@@ -96,20 +33,44 @@ public class Checker implements Runnable {
         displayLocal(uuid, response);
     }
 
+    private boolean checkJoined(ProxiedPlayer player, UUID uuid) {
+        if (!joined.containsKey(uuid)) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.SECOND, Main.getBungeeSettings().getKickPeriod());
+            joined.put(uuid, calendar.getTime());
+        } else {
+            Date date = joined.get(uuid);
+            if (date.before(new Date())) {
+                joined.remove(uuid);
+                player.disconnect(new TextComponent(Main.getBungeeSettings().getMessage("kick.timed_out")));
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void run() {
         for (ProxiedPlayer player : Main.getServer().getPlayers()) {
-            if (duplicate.contains(player.getUniqueId())) {
-                duplicate.remove(player.getUniqueId());
+            UUID uuid = player.getUniqueId();
+
+            if (duplicate.contains(uuid)) {
+                duplicate.remove(uuid);
                 continue;
             }
 
-            LoginResponse response = TAuth.getManager().isAutheticated(player.getUniqueId());
+            LoginResponse response = TAuth.getManager().isAutheticated(uuid);
             if (response != LoginResponse.OK) {
-                player.connect(Main.getServer().getServerInfo(
-                        TAuth.getAuthBalancer().getServer(player.getUniqueId())
-                ));
-                displayLocal(player.getUniqueId(), response);
+                if (!checkJoined(player, uuid))
+                    return;
+
+                if (!Main.getBungeeSettings().getAuthServers().contains(player.getServer().getInfo().getName()))
+                    player.connect(Main.getServer().getServerInfo(
+                            TAuth.getAuthBalancer().getServer(uuid)
+                    ));
+                displayLocal(uuid, response);
+            } else {
+                joined.remove(uuid);
             }
         }
     }

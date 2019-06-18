@@ -1,5 +1,8 @@
 package me.theseems.tauth.config;
 
+import me.theseems.tauth.utils.BungeeTitle;
+import net.md_5.bungee.api.Title;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -7,6 +10,7 @@ import net.md_5.bungee.config.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class YamlSettings implements BungeeSettings {
@@ -34,14 +38,17 @@ public class YamlSettings implements BungeeSettings {
         T value = get(clazz, name);
         if (value == null)
             return def;
-        else
+        else {
             return value;
+        }
     }
 
     private <T> List<T> getList(Class<T> clazz, String name) {
         Object value = configuration.getList(name);
-        if (value == null)
+        if (value == null) {
+            configuration.set(name, Collections.singletonList(name));
             return null;
+        }
         List<?> list = (List<?>) value;
         if (list.size() == 0)
             return new ArrayList<>();
@@ -66,6 +73,41 @@ public class YamlSettings implements BungeeSettings {
     @Override
     public int getCheckerPeriod() {
         return getOrDefault(Integer.class, "checker_period", 5000);
+    }
+
+    @Override
+    public int getServerPeriod() {
+        return getOrDefault(Integer.class, "update_period", 30);
+    }
+
+    @Override
+    public int getKickPeriod() {
+        return getOrDefault(Integer.class, "kick_period", 30);
+    }
+
+    @Override
+    public Title getTitle(String id) {
+        String key = "messages." + id;
+        String title = getOrDefault(String.class, key + ".title", id + ".title");
+        String subtitle = getOrDefault(String.class, key + ".subtitle", id + ".subtitle");
+        int fadeIn = getOrDefault(Integer.class, key + ".fade_in", 10);
+        int fadeOut = getOrDefault(Integer.class, key + ".fade_out", 10);
+        int stay = getOrDefault(Integer.class, key + ".stay", 30);
+
+        return new BungeeTitle()
+                .title(new TextComponent(title))
+                .subTitle(new TextComponent(subtitle))
+                .fadeIn(fadeIn)
+                .fadeOut(fadeOut)
+                .stay(stay);
+    }
+
+    @Override
+    public String getMessage(String id) {
+        String key = "messages." + id;
+        if (!configuration.contains(key))
+            return id;
+        return configuration.getString(key);
     }
 
     @Override
