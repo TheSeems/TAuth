@@ -10,9 +10,19 @@ next:
 # Server info update period in seconds
 update_period: 30
 
-# Player checker period
+# Player checker period in milliseconds
 checker_period: 5000
 
+# Database. By default TAuth uses memory to store their data there
+# WARNING: If you are using memo db type, many players may crash your server. Consider using database such as PostgreSQL
+
+# db:
+#  type: "postgres"
+#  url: "jdbc:postgresql://localhost/minecraft"
+#  user: "minecraft"
+#  pass: "heresthemftea"
+
+# Localization
 messages:
   login:
     usage: '§eUsage§7: §e/login §7<pass>'
@@ -52,7 +62,7 @@ messages:
     usage: "§eUsage§7 §e/register §7<pass> <repeat-pass>"
     no_match: "§7Passwords §cdont match"
   kick:
-    timed_out: §c§lYou did not have enough time to log in / register
+    timed_out: §c§lYou have run out of time to log in
 
 # Session expire seconds
 expire: 7200

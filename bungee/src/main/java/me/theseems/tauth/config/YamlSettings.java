@@ -111,6 +111,26 @@ public class YamlSettings implements BungeeSettings {
     }
 
     @Override
+    public String getDbType() {
+        return getOrDefault(String.class, "db.type", "memo");
+    }
+
+    @Override
+    public String getDbUrl() {
+        return getOrDefault(String.class, "db.url", null);
+    }
+
+    @Override
+    public String getDbUser() {
+        return getOrDefault(String.class, "db.user", null);
+    }
+
+    @Override
+    public String getDbPassword() {
+        return getOrDefault(String.class, "db.pass", null);
+    }
+
+    @Override
     public List<String> getAuthServers() {
         return getList(String.class, "auth");
     }

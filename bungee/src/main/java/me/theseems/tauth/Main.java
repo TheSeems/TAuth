@@ -6,6 +6,8 @@ import me.theseems.tauth.commands.LogoutCommand;
 import me.theseems.tauth.commands.RegisterCommand;
 import me.theseems.tauth.config.BungeeSettings;
 import me.theseems.tauth.config.YamlSettings;
+import me.theseems.tauth.db.JDBCDb;
+import me.theseems.tauth.db.MemoDb;
 import me.theseems.tauth.listeners.FirstJoinListener;
 import me.theseems.tauth.listeners.LoginTeleportListener;
 import me.theseems.tauth.listeners.NextServerListener;
@@ -49,7 +51,25 @@ public class Main extends Plugin {
         }
 
         server = this.getProxy();
-        TAuth.setDb(new MemAuthDB());
+        switch (bungeeSettings.getDbType()) {
+            default:
+                getLogger().warning("Unknown db provider given: '" + bungeeSettings.getDbType() + "'. Using MEMORY db instead");
+                TAuth.setDb(new MemoDb());
+                break;
+            case "memo":
+                getLogger().warning("Selecting MEMORY db. This may be bad if you have a lot of players. Consider using postgres or anything else");
+                TAuth.setDb(new MemoDb());
+                break;
+            case "postgres":
+                getLogger().info("Using PostgreSQL as AuthDb");
+                TAuth.setDb(new JDBCDb(
+                        bungeeSettings.getDbUrl(),
+                        bungeeSettings.getDbUser(),
+                        bungeeSettings.getDbPassword()
+                ));
+                break;
+        }
+
         TAuth.setHasher(new SHA512AuthHasher());
         TAuth.setManager(new TAuthManager());
         TAuth.setServer(new BungeeAuthServer(this));

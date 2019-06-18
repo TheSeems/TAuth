@@ -1,6 +1,7 @@
 package me.theseems.tauth.tests;
 
 import me.theseems.tauth.*;
+import me.theseems.tauth.db.MemoDb;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -12,7 +13,7 @@ class RegisterTest {
 
     RegisterTest() {
         TAuth.setHasher(new SHA512AuthHasher());
-        TAuth.setDb(new MemAuthDB());
+        TAuth.setDb(new MemoDb());
         TAuth.setManager(new TAuthManager());
         TAuth.setSettings(new Settings() {
             @Override
@@ -86,20 +87,20 @@ class RegisterTest {
         assertEquals(TAuth.getManager().register(player, hashed), RegisterResponse.OK);
         assertEquals(TAuth.getManager().register(player, hashed), RegisterResponse.REGISTERED);
 
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().autoLogin(player));
         TAuth.setServer(another);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.EXPIRED);
+        assertEquals(LoginResponse.EXPIRED, TAuth.getManager().autoLogin(player));
 
         TAuth.setServer(one);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().autoLogin(player));
 
         TAuth.setServer(another);
-        assertEquals(TAuth.getManager().login(player, hashed), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().login(player, hashed));
 
         TAuth.setServer(another);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().autoLogin(player));
 
         TAuth.setServer(one);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.EXPIRED);
+        assertEquals(LoginResponse.EXPIRED, TAuth.getManager().autoLogin(player));
     }
 }

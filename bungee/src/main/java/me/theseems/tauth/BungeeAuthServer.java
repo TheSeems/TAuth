@@ -1,6 +1,7 @@
 package me.theseems.tauth;
 
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.HashMap;
@@ -30,19 +31,27 @@ public class BungeeAuthServer implements AuthServer, Runnable {
 
     @Override
     public int getOnline(String server) {
-        return online.getOrDefault(server, Integer.MAX_VALUE);
+        return online.computeIfAbsent(server, s -> Integer.MAX_VALUE);
     }
 
     @Override
     public void run() {
         // Testing each server
-        server.getConfig().getServers().forEach((s, serverInfo) -> serverInfo.ping((serverPing, throwable) -> {
-            if (throwable == null)
-                online.put(serverInfo.getName(), serverPing.getPlayers().getOnline());
-            else {
-                System.err.println("Error pinging server " + serverInfo.getName() + " => " + throwable.getLocalizedMessage());
-                online.remove(serverInfo.getName());
+        online.forEach((s, integer) -> {
+            ServerInfo info = server.getServerInfo(s);
+            if (info == null) {
+                System.err.println("Got a query on a server '" + s + "' which does not exist");
+                online.remove(s);
+            } else {
+                info.ping((serverPing, throwable) -> {
+                    if (throwable != null) {
+                        System.err.println("Error pinging " + s + " => " + throwable.getLocalizedMessage());
+                        online.remove(s);
+                    } else {
+                        online.put(s, serverPing.getPlayers().getOnline());
+                    }
+                });
             }
-        }));
+        });
     }
 }

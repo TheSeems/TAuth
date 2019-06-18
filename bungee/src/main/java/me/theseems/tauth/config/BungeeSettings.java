@@ -41,4 +41,32 @@ public interface BungeeSettings extends Settings {
      * @return message or empty array
      */
     String getMessage(String id);
+
+    /**
+     * Get type of db (memo, postgresql etc)
+     *
+     * @return db type
+     */
+    String getDbType();
+
+    /**
+     * Get url of database
+     *
+     * @return url
+     */
+    String getDbUrl();
+
+    /**
+     * Get db user
+     *
+     * @return user
+     */
+    String getDbUser();
+
+    /**
+     * Get db password
+     *
+     * @return password
+     */
+    String getDbPassword();
 }

@@ -1,7 +1,6 @@
 package me.theseems.tauth;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,7 +48,7 @@ public class TAuthManager implements AuthManager {
         if (optional.isPresent()) {
             if (!optional.get().getIp().equals(TAuth.getServer().getIp(player)))
                 return LoginResponse.EXPIRED;
-            if (optional.get().getExpire().after(new Date()))
+            if (optional.get().getExpire().isAfter(LocalDateTime.now()))
                 return LoginResponse.OK;
             else
                 return LoginResponse.EXPIRED;
@@ -68,10 +67,8 @@ public class TAuthManager implements AuthManager {
 
     @Override
     public void updateSession(UUID player) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, TAuth.getSettings().getExpireSeconds());
         TAuth.getDb().setSession(player, new TSession(
-                calendar.getTime(),
+                LocalDateTime.now().plusSeconds(TAuth.getSettings().getExpireSeconds()),
                 TAuth.getServer().getIp(player)
         ));
     }

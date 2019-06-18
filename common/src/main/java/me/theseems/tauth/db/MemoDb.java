@@ -1,15 +1,18 @@
-package me.theseems.tauth;
+package me.theseems.tauth.db;
+
+import me.theseems.tauth.AuthDB;
+import me.theseems.tauth.Session;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class MemAuthDB implements AuthDB {
+public class MemoDb implements AuthDB {
     private Map<UUID, String> hashes;
     private Map<UUID, Session> sessions;
 
-    public MemAuthDB() {
+    public MemoDb() {
         hashes = new HashMap<>();
         sessions = new HashMap<>();
     }
