@@ -72,7 +72,10 @@ public class JDBCDb implements AuthDB {
             PreparedStatement statement = connection.prepareStatement("SELECT ip, expire FROM tauth WHERE uuid = ?");
             statement.setString(1, player.toString());
             ResultSet set = statement.executeQuery();
-            set.next();
+            if (!set.next()) {
+                throw new IllegalStateException("Session must be presented if player exists");
+            }
+
             String ip = set.getString("ip");
             LocalDateTime expire = set.getTimestamp("expire").toLocalDateTime();
             connection.close();
@@ -93,7 +96,9 @@ public class JDBCDb implements AuthDB {
             PreparedStatement statement = connection.prepareStatement("SELECT hash FROM tauth WHERE uuid = ?");
             statement.setString(1, player.toString());
             ResultSet set = statement.executeQuery();
-            set.next();
+            if (!set.next()) {
+                throw new IllegalStateException("Hash must be presented if player exists");
+            }
 
             String str = set.getString("hash");
             connection.close();
