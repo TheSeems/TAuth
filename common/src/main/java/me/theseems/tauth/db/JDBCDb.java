@@ -111,9 +111,11 @@ public class JDBCDb implements AuthDB {
             PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM tauth WHERE uuid = ?");
             statement.setString(1, player.toString());
             ResultSet set = statement.executeQuery();
-            boolean b = set.next();
+            if (set.next()) {
+                connection.close();
+                return true;
+            }
             connection.close();
-            return b;
         } catch (SQLException e) {
             e.printStackTrace();
         }
