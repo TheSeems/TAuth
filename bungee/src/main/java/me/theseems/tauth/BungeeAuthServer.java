@@ -4,9 +4,9 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class BungeeAuthServer implements AuthServer, Runnable {
@@ -14,7 +14,7 @@ public class BungeeAuthServer implements AuthServer, Runnable {
     private Map<String, Integer> online;
 
     public BungeeAuthServer(Plugin plugin) {
-        online = new HashMap<>();
+        online = new ConcurrentHashMap<>();
         this.server = plugin.getProxy();
         server.getScheduler().schedule(plugin, this, 0, Main.getBungeeSettings().getServerPeriod(), TimeUnit.SECONDS);
     }
