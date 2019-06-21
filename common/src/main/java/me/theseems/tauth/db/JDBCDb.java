@@ -43,10 +43,12 @@ public class JDBCDb implements AuthDB {
         if (exist(player))
             return;
         try {
-            PreparedStatement statement = getConnection().prepareStatement("INSERT INTO tauth VALUES (?, null, null, null)");
+            Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO tauth VALUES (?, null, null, null)");
             statement.setString(1, player.toString());
             statement.execute();
             statement.closeOnCompletion();
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -73,6 +75,7 @@ public class JDBCDb implements AuthDB {
             statement.setString(1, player.toString());
             ResultSet set = statement.executeQuery();
             if (!set.next()) {
+                connection.close();
                 throw new IllegalStateException("Session must be presented if player exists");
             }
 
@@ -97,6 +100,7 @@ public class JDBCDb implements AuthDB {
             statement.setString(1, player.toString());
             ResultSet set = statement.executeQuery();
             if (!set.next()) {
+                connection.close();
                 throw new IllegalStateException("Hash must be presented if player exists");
             }
 
@@ -147,12 +151,14 @@ public class JDBCDb implements AuthDB {
     public void setSession(UUID player, Session session) {
         try {
             initPlayer(player);
-            PreparedStatement statement = getConnection().prepareStatement("UPDATE tauth SET ip=?, expire=? WHERE uuid=?");
+            Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement("UPDATE tauth SET ip=?, expire=? WHERE uuid=?");
             statement.setString(1, session.getIp());
             statement.setTimestamp(2, Timestamp.valueOf(session.getExpire()));
             statement.setString(3, player.toString());
             statement.execute();
             statement.closeOnCompletion();
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
