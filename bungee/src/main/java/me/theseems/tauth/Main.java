@@ -94,6 +94,7 @@ public class Main extends Plugin {
 
                 @Override
                 public void init(List<String> serverList) {
+                    getLogger().warning("Next pool balancer is not presented!");
                 }
             });
 
