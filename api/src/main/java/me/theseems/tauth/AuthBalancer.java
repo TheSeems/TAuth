@@ -1,5 +1,6 @@
 package me.theseems.tauth;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface AuthBalancer {
@@ -10,4 +11,11 @@ public interface AuthBalancer {
      * @return server name
      */
     String getServer(UUID player);
+
+    /**
+     * Init balancer with server list
+     *
+     * @param serverList of servers
+     */
+    void init(List<String> serverList);
 }

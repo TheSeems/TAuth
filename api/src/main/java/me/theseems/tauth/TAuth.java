@@ -56,6 +56,7 @@ public class TAuth {
 
     public static void setAuthBalancer(AuthBalancer authBalancer) {
         TAuth.authBalancer = authBalancer;
+        authBalancer.init(settings.getAuthServers());
     }
 
     public static AuthBalancer getNextBalancer() {
@@ -64,5 +65,6 @@ public class TAuth {
 
     public static void setNextBalancer(AuthBalancer nextBalancer) {
         TAuth.nextBalancer = nextBalancer;
+        nextBalancer.init(settings.getNextServers());
     }
 }

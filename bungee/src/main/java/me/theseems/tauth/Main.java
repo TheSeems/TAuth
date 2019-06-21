@@ -1,6 +1,5 @@
 package me.theseems.tauth;
 
-import me.theseems.tauth.balancers.SimpleBalancer;
 import me.theseems.tauth.commands.LoginCommand;
 import me.theseems.tauth.commands.LogoutCommand;
 import me.theseems.tauth.commands.RegisterCommand;
@@ -17,6 +16,8 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -60,8 +61,8 @@ public class Main extends Plugin {
                 getLogger().warning("Selecting MEMORY db. This may be bad if you have a lot of players. Consider using postgres or anything else");
                 TAuth.setDb(new MemoDb());
                 break;
-            case "postgres":
-                getLogger().info("Using PostgreSQL as AuthDb");
+            case "jdbc":
+                getLogger().info("Using JDBC as AuthDb");
                 TAuth.setDb(new JDBCDb(
                         bungeeSettings.getDbUrl(),
                         bungeeSettings.getDbUser(),
@@ -70,18 +71,31 @@ public class Main extends Plugin {
                 break;
         }
 
-        TAuth.setHasher(new SHA512AuthHasher());
         TAuth.setManager(new TAuthManager());
         TAuth.setServer(new BungeeAuthServer(this));
         TAuth.setSettings(bungeeSettings);
+        TAuth.setHasher(bungeeSettings.getHasher());
+        TAuth.setAuthBalancer(bungeeSettings.getAuthBalancer());
+        TAuth.setNextBalancer(bungeeSettings.getNextBalancer());
 
-        TAuth.setAuthBalancer(new SimpleBalancer(bungeeSettings.getAuthServers()));
+        getLogger().info("Using " + getBungeeSettings().getAuthBalancer().getClass().getName() + " as auth pool balancer");
+        getLogger().info("Using " + getBungeeSettings().getNextBalancer().getClass().getName() + " as next pool balancer");
+        getLogger().info("Using " + getBungeeSettings().getHasher().getClass().getName() + " as password hasher");
 
         if (bungeeSettings.getNextServers() != null)
-            TAuth.setNextBalancer(new SimpleBalancer(bungeeSettings.getNextServers()));
+            TAuth.getNextBalancer().init(bungeeSettings.getNextServers());
         else
             // By default we return the player's current location
-            TAuth.setNextBalancer(player -> server.getPlayer(player).getServer().getInfo().getName());
+            TAuth.setNextBalancer(new AuthBalancer() {
+                @Override
+                public String getServer(UUID player) {
+                    return server.getPlayer(player).getServer().getInfo().getName();
+                }
+
+                @Override
+                public void init(List<String> serverList) {
+                }
+            });
 
         getProxy().getPluginManager().registerListener(this, new LoginTeleportListener());
         getProxy().getPluginManager().registerListener(this, new NextServerListener());

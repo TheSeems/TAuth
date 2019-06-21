@@ -6,8 +6,15 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 public class AsyncBalancer extends SimpleBalancer {
-    public AsyncBalancer(List<String> servers, long period) {
-        super(servers);
+    private long period;
+
+    public AsyncBalancer(long period) {
+        this.period = period;
+    }
+
+    @Override
+    public void init(List<String> serverList) {
+        super.init(serverList);
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override

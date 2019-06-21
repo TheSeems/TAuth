@@ -1,5 +1,7 @@
 package me.theseems.tauth.config;
 
+import me.theseems.tauth.AuthBalancer;
+import me.theseems.tauth.AuthHasher;
 import me.theseems.tauth.utils.BungeeTitle;
 import net.md_5.bungee.api.Title;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -9,13 +11,17 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class YamlSettings implements BungeeSettings {
     private File file;
     private Configuration configuration;
+
+    private AuthHasher hasher;
+    private AuthBalancer authBalancer;
+    private AuthBalancer nextBalancer;
 
     public YamlSettings(File file) {
         this.file = file;
@@ -45,17 +51,53 @@ public class YamlSettings implements BungeeSettings {
 
     private <T> List<T> getList(Class<T> clazz, String name) {
         Object value = configuration.getList(name);
-        if (value == null) {
-            configuration.set(name, Collections.singletonList(name));
+        if (value == null)
             return null;
-        }
         List<?> list = (List<?>) value;
         if (list.size() == 0)
             return new ArrayList<>();
-        else if (list.get(0).getClass() == clazz)
-            // It should be List<T> because the first element is T
+        else if (clazz.isAssignableFrom(list.get(0).getClass()))
+            // It should be List<T> because the first element => T
             //noinspection unchecked
             return (List<T>) list;
+        return null;
+    }
+
+    private AuthHasher loadHasher() {
+        String clazz = getOrDefault(String.class, "hasher.class", "me.theseems.tauth.hashers.SHA512AuthHasher");
+        List<?> settings = getList(Object.class, "hasher.settings");
+        try {
+            Class hasherClass = Class.forName(clazz);
+            Object object = hasherClass.getConstructors()[0].newInstance(settings.toArray(new Object[0]));
+            if (!(object instanceof AuthHasher))
+                throw new IllegalStateException(hasherClass + " should implement AuthHasher");
+            return (AuthHasher) object;
+        } catch (ClassNotFoundException e) {
+            System.err.println("Cannot find hasher class '" + clazz + "'");
+            e.printStackTrace();
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            System.err.println("Error constructing class '" + clazz + "' with args: " + settings.toString());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private AuthBalancer loadBalancer(String name) {
+        String clazz = getOrDefault(String.class, name + ".class", "me.theseems.tauth.balancers.SimpleBalancer");
+        List<?> settings = getList(Object.class, name + ".settings");
+        try {
+            Class balancerClass = Class.forName(clazz);
+            Object object = balancerClass.getConstructors()[0].newInstance(settings.toArray());
+            if (!(object instanceof AuthBalancer))
+                throw new IllegalStateException(balancerClass + " should implement AuthBalancer");
+            return (AuthBalancer) object;
+        } catch (ClassNotFoundException e) {
+            System.err.println("Cannot find balancer class '" + clazz + "'");
+            e.printStackTrace();
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            System.err.println("Error constructing class '" + clazz + "' with args: " + settings.toString());
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -64,6 +106,9 @@ public class YamlSettings implements BungeeSettings {
             configuration = ConfigurationProvider
                     .getProvider(YamlConfiguration.class)
                     .load(file);
+            hasher = loadHasher();
+            authBalancer = loadBalancer("auth_balancer");
+            nextBalancer = loadBalancer("next_balancer");
         } catch (IOException e) {
             System.err.println("Error loading config file");
             e.printStackTrace();
@@ -128,6 +173,21 @@ public class YamlSettings implements BungeeSettings {
     @Override
     public String getDbPassword() {
         return getOrDefault(String.class, "db.pass", null);
+    }
+
+    @Override
+    public AuthHasher getHasher() {
+        return hasher;
+    }
+
+    @Override
+    public AuthBalancer getAuthBalancer() {
+        return authBalancer;
+    }
+
+    @Override
+    public AuthBalancer getNextBalancer() {
+        return nextBalancer;
     }
 
     @Override

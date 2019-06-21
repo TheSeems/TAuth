@@ -41,7 +41,9 @@ class BalancerTest {
 
     @Test
     void simpleBalancerTest() {
-        balancer = new SimpleBalancer(Arrays.asList("first", "second", "third"));
+        balancer = new SimpleBalancer();
+        balancer.init(Arrays.asList("first", "second", "third"));
+
         servers.put("first", 1213);
         servers.put("second", 312);
         servers.put("third", 32);
@@ -61,7 +63,9 @@ class BalancerTest {
         servers.put("second", 312);
         servers.put("third", 32);
         servers.put("unknown", 0);
-        balancer = new AsyncBalancer(Arrays.asList("first", "second", "third"), 2);
+        balancer = new AsyncBalancer(2);
+        balancer.init(Arrays.asList("first", "second", "third"));
+
         Thread.sleep(10);
         assertEquals("third", balancer.getServer(null));
         servers.put("second", 500);
@@ -72,7 +76,9 @@ class BalancerTest {
         servers.clear();
 
         // Takes too long to update, so we can only get the first server with that period (50000)
-        balancer = new AsyncBalancer(Arrays.asList("first", "second", "third"), 50000);
+        balancer = new AsyncBalancer(50000);
+        balancer.init(Arrays.asList("first", "second", "third"));
+
         servers.put("first", 1213);
         servers.put("second", 312);
         servers.put("third", 32);

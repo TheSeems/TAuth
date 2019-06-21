@@ -10,17 +10,34 @@ next:
 # Server info update period in seconds
 update_period: 30
 
-# Player checker period in milliseconds
+# Player checker period
 checker_period: 5000
 
-# Database. By default TAuth uses memory to store their data there
-# WARNING: If you are using memo db type, many players may crash your server. Consider using database such as PostgreSQL
+# Non-authorized player lifetime before kick in seconds
+kick_period: 30
 
+# Session expire seconds
+expire: 7200
+
+# Database (type memo by default)
 # db:
-#  type: "postgres"
-#  url: "jdbc:postgresql://localhost/minecraft"
+#  type: "jdbc"
+#  url: "jdbc:postgresql://192.168.1.48/minecraft"
 #  user: "minecraft"
 #  pass: "heresthemftea"
+
+# Balancers (me.theseems.tauth.balancers.SimpleBalancer by default)
+# auth_balancer:
+#  class: me.theseems.tauth.balancers.AsyncBalancer
+#  settings:
+# Delay in milliseconds
+#    - 10000
+# next_balancer:
+#  class: me.theseems.tauth.balancers.SimpleBalancer
+
+# You can change hashing algorithm here (me.theseems.tauth.hashers.SHA512AuthHasher by default)
+# hasher:
+#  class: me.theseems.tauth.hashers.SHA512AuthHasher
 
 # Localization
 messages:
@@ -63,9 +80,3 @@ messages:
     no_match: "§7Passwords §cdont match"
   kick:
     timed_out: §c§lYou have run out of time to log in
-
-# Session expire seconds
-expire: 7200
-
-# Non-authorized player lifetime before kick in seconds
-kick_period: 30

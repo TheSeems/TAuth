@@ -1,5 +1,7 @@
 package me.theseems.tauth.config;
 
+import me.theseems.tauth.AuthBalancer;
+import me.theseems.tauth.AuthHasher;
 import me.theseems.tauth.Settings;
 import net.md_5.bungee.api.Title;
 
@@ -69,4 +71,25 @@ public interface BungeeSettings extends Settings {
      * @return password
      */
     String getDbPassword();
+
+    /**
+     * Get hasher
+     *
+     * @return hasher
+     */
+    AuthHasher getHasher();
+
+    /**
+     * Auth balancer
+     *
+     * @return auth balancer
+     */
+    AuthBalancer getAuthBalancer();
+
+    /**
+     * Next servers balancer
+     *
+     * @return next balancer
+     */
+    AuthBalancer getNextBalancer();
 }

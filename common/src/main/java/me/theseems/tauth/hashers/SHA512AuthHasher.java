@@ -1,4 +1,6 @@
-package me.theseems.tauth;
+package me.theseems.tauth.hashers;
+
+import me.theseems.tauth.AuthHasher;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

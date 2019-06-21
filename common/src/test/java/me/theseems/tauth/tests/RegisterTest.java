@@ -2,6 +2,7 @@ package me.theseems.tauth.tests;
 
 import me.theseems.tauth.*;
 import me.theseems.tauth.db.MemoDb;
+import me.theseems.tauth.hashers.SHA512AuthHasher;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
