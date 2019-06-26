@@ -16,12 +16,15 @@ public class AsyncBalancer extends SimpleBalancer {
     public void init(List<String> serverList) {
         super.init(serverList);
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                update();
-            }
-        }, period, period);
+        timer.scheduleAtFixedRate(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        update();
+                    }
+                },
+                period,
+                period);
     }
 
     @Override

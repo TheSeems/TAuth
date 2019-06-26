@@ -16,7 +16,9 @@ public class BungeeAuthServer implements AuthServer, Runnable {
     public BungeeAuthServer(Plugin plugin) {
         online = new ConcurrentHashMap<>();
         this.server = plugin.getProxy();
-        server.getScheduler().schedule(plugin, this, 0, Main.getBungeeSettings().getServerPeriod(), TimeUnit.SECONDS);
+        server
+                .getScheduler()
+                .schedule(plugin, this, 0, Main.getBungeeSettings().getServerPeriod(), TimeUnit.SECONDS);
     }
 
     @Override
@@ -37,21 +39,24 @@ public class BungeeAuthServer implements AuthServer, Runnable {
     @Override
     public void run() {
         // Testing each server
-        online.forEach((s, integer) -> {
-            ServerInfo info = server.getServerInfo(s);
-            if (info == null) {
-                System.err.println("Got a query on a server '" + s + "' which does not exist");
-                online.remove(s);
-            } else {
-                info.ping((serverPing, throwable) -> {
-                    if (throwable != null) {
-                        System.err.println("Error pinging " + s + " => " + throwable.getLocalizedMessage());
+        online.forEach(
+                (s, integer) -> {
+                    ServerInfo info = server.getServerInfo(s);
+                    if (info == null) {
+                        System.err.println("Got a query on a server '" + s + "' which does not exist");
                         online.remove(s);
                     } else {
-                        online.put(s, serverPing.getPlayers().getOnline());
-                    }
+                        info.ping(
+                                (serverPing, throwable) -> {
+                                    if (throwable != null) {
+                                        System.err.println(
+                                                "Error pinging " + s + " => " + throwable.getLocalizedMessage());
+                                        online.remove(s);
+                                    } else {
+                                        online.put(s, serverPing.getPlayers().getOnline());
+                                    }
                 });
-            }
+                    }
         });
     }
 }

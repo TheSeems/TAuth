@@ -27,8 +27,7 @@ public class SimpleBalancer implements AuthBalancer {
     }
 
     public void update() {
-        if (servers.size() == 0)
-            return;
+        if (servers.size() == 0) return;
 
         balanced = servers.get(0);
         int lowest = TAuth.getServer().getOnline(servers.get(0));

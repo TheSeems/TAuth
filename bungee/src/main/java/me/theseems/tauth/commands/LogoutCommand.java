@@ -24,8 +24,7 @@ public class LogoutCommand extends Command {
 
         if (response == LoginResponse.OK) {
             ServerInfo auth = Main.getServer().getServerInfo(TAuth.getAuthBalancer().getServer(uuid));
-            if (!auth.getName().equals(player.getServer().getInfo().getName()))
-                player.connect(auth);
+            if (!auth.getName().equals(player.getServer().getInfo().getName())) player.connect(auth);
             Checker.display(uuid, TAuth.getManager().isAutheticated(uuid));
         }
     }

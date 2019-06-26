@@ -6,6 +6,7 @@ import java.util.UUID;
 public interface AuthDB {
     /**
      * Get session by ip
+     *
      * @param player to get session of
      * @return session
      */
@@ -13,6 +14,7 @@ public interface AuthDB {
 
     /**
      * Get hash of player
+     *
      * @param player to get hash of
      * @return hash
      */
@@ -20,6 +22,7 @@ public interface AuthDB {
 
     /**
      * Do player exist (registered)
+     *
      * @param player to check
      * @return exist or not
      */
@@ -27,18 +30,21 @@ public interface AuthDB {
 
     /**
      * Set hash to player
+     *
      * @param player to set hash
      */
     void setHash(UUID player, String hash);
 
     /**
      * Set session
+     *
      * @param session to set
      */
     void setSession(UUID player, Session session);
 
     /**
      * Clear session of player
+     *
      * @param player to clear
      */
     void clearSession(UUID player);

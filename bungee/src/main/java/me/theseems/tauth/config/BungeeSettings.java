@@ -21,8 +21,7 @@ public interface BungeeSettings extends Settings {
     int getServerPeriod();
 
     /**
-     * Get period in seconds after
-     * When this period is expired, player will be kicked
+     * Get period in seconds after When this period is expired, player will be kicked
      *
      * @return kick period
      */
@@ -92,4 +91,11 @@ public interface BungeeSettings extends Settings {
      * @return next balancer
      */
     AuthBalancer getNextBalancer();
+
+    /**
+     * If debug mode is enabled
+     *
+     * @return debug
+     */
+    Boolean getDebug();
 }

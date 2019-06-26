@@ -23,13 +23,11 @@ public class RegisterCommand extends Command {
         }
 
         if (strings.length < 2) {
-            commandSender.sendMessage(new TextComponent(
-                    Main.getBungeeSettings().getMessage("register.usage")
-            ));
+            commandSender.sendMessage(
+                    new TextComponent(Main.getBungeeSettings().getMessage("register.usage")));
         } else if (!strings[0].equals(strings[1])) {
-            commandSender.sendMessage(new TextComponent(
-                    Main.getBungeeSettings().getMessage("register.no_match")
-            ));
+            commandSender.sendMessage(
+                    new TextComponent(Main.getBungeeSettings().getMessage("register.no_match")));
         } else {
             String hash = strings[0];
             hash = TAuth.getHasher().hash(hash);
@@ -38,12 +36,9 @@ public class RegisterCommand extends Command {
             if (registerResponse == RegisterResponse.OK) {
                 Main.getServer()
                         .getPluginManager()
-                        .callEvent(new TLoginEvent(
-                                Main.getServer().getPlayer(player), false
-                        ));
+                        .callEvent(new TLoginEvent(Main.getServer().getPlayer(player), false));
                 Checker.display(player, registerResponse);
             }
-
         }
     }
 }

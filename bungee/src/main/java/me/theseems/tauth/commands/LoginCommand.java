@@ -26,9 +26,8 @@ public class LoginCommand extends Command {
         }
 
         if (strings.length < 1) {
-            commandSender.sendMessage(new TextComponent(
-                    Main.getBungeeSettings().getMessage("login.usage")
-            ));
+            commandSender.sendMessage(
+                    new TextComponent(Main.getBungeeSettings().getMessage("login.usage")));
         } else {
             String hash = strings[0];
             hash = TAuth.getHasher().hash(hash);
@@ -38,9 +37,7 @@ public class LoginCommand extends Command {
             if (response == LoginResponse.OK) {
                 Main.getServer()
                         .getPluginManager()
-                        .callEvent(new TLoginEvent(
-                                Main.getServer().getPlayer(player), false
-                        ));
+                        .callEvent(new TLoginEvent(Main.getServer().getPlayer(player), false));
             }
         }
     }

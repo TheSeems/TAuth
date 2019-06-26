@@ -24,6 +24,12 @@ public class BungeeTitle implements Title {
         return title;
     }
 
+    private static void sendPacket(ProxiedPlayer player, DefinedPacket packet) {
+        if (packet != null) {
+            player.unsafe().sendPacket(packet);
+        }
+    }
+
     @Override
     public Title title(BaseComponent text) {
         if (title == null) {
@@ -117,12 +123,6 @@ public class BungeeTitle implements Title {
         times = null;
 
         return this;
-    }
-
-    private static void sendPacket(ProxiedPlayer player, DefinedPacket packet) {
-        if (packet != null) {
-            player.unsafe().sendPacket(packet);
-        }
     }
 
     @Override

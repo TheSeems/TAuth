@@ -1,5 +1,9 @@
 package me.theseems.tauth;
 
 public enum LoginResponse {
-    FORBIDDEN, UNREGISTERED, OK, EXPIRED, INCORRECT
+    FORBIDDEN,
+    UNREGISTERED,
+    OK,
+    EXPIRED,
+    INCORRECT
 }

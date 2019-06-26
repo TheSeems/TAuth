@@ -11,8 +11,7 @@ public class Utils {
             byte[] buf = new byte[1024];
             int len;
 
-            while ((len = in.read(buf)) > 0)
-                out.write(buf, 0, len);
+            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
 
             out.close();
             in.close();
@@ -22,8 +21,7 @@ public class Utils {
     }
 
     public static File loadResource(Plugin plugin, String name) throws IOException {
-        if (!plugin.getDataFolder().exists())
-            plugin.getDataFolder().mkdirs();
+        if (!plugin.getDataFolder().exists()) plugin.getDataFolder().mkdirs();
 
         File config = new File(plugin.getDataFolder(), name);
         if (!config.exists()) {

@@ -16,46 +16,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class YamlSettings implements BungeeSettings {
-    private File file;
-    private Configuration configuration;
+    private File settingsFile, messagesFile;
+    private Configuration settings, messages;
 
     private AuthHasher hasher;
     private AuthBalancer authBalancer;
     private AuthBalancer nextBalancer;
 
-    public YamlSettings(File file) {
-        this.file = file;
+    public YamlSettings(File settingsFile, File messagesFile) {
+        this.settingsFile = settingsFile;
+        this.messagesFile = messagesFile;
         load();
     }
 
-    private <T> T get(Class<T> clazz, String name) {
+    private <T> T get(Class<T> clazz, String name, Configuration configuration) {
         Object value = configuration.get(name);
-        if (value == null)
-            return null;
-        if (value.getClass() == clazz)
-            return clazz.cast(value);
+        if (value == null) return null;
+        if (value.getClass() == clazz) return clazz.cast(value);
         else {
-            System.out.println("WARNING: Expected class of setting '" + name + "' is " + clazz.getCanonicalName() + " but " + value.getClass().getCanonicalName() + " found");
+            System.out.println(
+                    "WARNING: Expected class of setting '"
+                            + name
+                            + "' is "
+                            + clazz.getCanonicalName()
+                            + " but "
+                            + value.getClass().getCanonicalName()
+                            + " found");
             return null;
         }
     }
 
     private <T> T getOrDefault(Class<T> clazz, String name, T def) {
-        T value = get(clazz, name);
-        if (value == null)
-            return def;
+        return getOrDefault(clazz, name, def, settings);
+    }
+
+    private <T> T getOrDefault(Class<T> clazz, String name, T def, Configuration configuration) {
+        T value = get(clazz, name, configuration);
+        if (value == null) return def;
         else {
             return value;
         }
     }
 
     private <T> List<T> getList(Class<T> clazz, String name) {
+        return getList(clazz, name, settings);
+    }
+
+    private <T> List<T> getList(Class<T> clazz, String name, Configuration configuration) {
         Object value = configuration.getList(name);
-        if (value == null)
-            return null;
+        if (value == null) return null;
         List<?> list = (List<?>) value;
-        if (list.size() == 0)
-            return new ArrayList<>();
+        if (list.size() == 0) return new ArrayList<>();
         else if (clazz.isAssignableFrom(list.get(0).getClass()))
             // It should be List<T> because the first element => T
             //noinspection unchecked
@@ -64,7 +75,8 @@ public class YamlSettings implements BungeeSettings {
     }
 
     private AuthHasher loadHasher() {
-        String clazz = getOrDefault(String.class, "hasher.class", "me.theseems.tauth.hashers.SHA512AuthHasher");
+        String clazz =
+                getOrDefault(String.class, "hasher.class", "me.theseems.tauth.hashers.SHA512AuthHasher");
         List<?> settings = getList(Object.class, "hasher.settings");
         try {
             Class hasherClass = Class.forName(clazz);
@@ -76,14 +88,16 @@ public class YamlSettings implements BungeeSettings {
             System.err.println("Cannot find hasher class '" + clazz + "'");
             e.printStackTrace();
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            System.err.println("Error constructing class '" + clazz + "' with args: " + settings.toString());
+            System.err.println(
+                    "Error constructing class '" + clazz + "' with args: " + settings.toString());
             e.printStackTrace();
         }
         return null;
     }
 
     private AuthBalancer loadBalancer(String name) {
-        String clazz = getOrDefault(String.class, name + ".class", "me.theseems.tauth.balancers.SimpleBalancer");
+        String clazz =
+                getOrDefault(String.class, name + ".class", "me.theseems.tauth.balancers.SimpleBalancer");
         List<?> settings = getList(Object.class, name + ".settings");
         try {
             Class balancerClass = Class.forName(clazz);
@@ -95,7 +109,8 @@ public class YamlSettings implements BungeeSettings {
             System.err.println("Cannot find balancer class '" + clazz + "'");
             e.printStackTrace();
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            System.err.println("Error constructing class '" + clazz + "' with args: " + settings.toString());
+            System.err.println(
+                    "Error constructing class '" + clazz + "' with args: " + settings.toString());
             e.printStackTrace();
         }
         return null;
@@ -103,9 +118,8 @@ public class YamlSettings implements BungeeSettings {
 
     private void load() {
         try {
-            configuration = ConfigurationProvider
-                    .getProvider(YamlConfiguration.class)
-                    .load(file);
+            settings = ConfigurationProvider.getProvider(YamlConfiguration.class).load(settingsFile);
+            messages = ConfigurationProvider.getProvider(YamlConfiguration.class).load(messagesFile);
             hasher = loadHasher();
             authBalancer = loadBalancer("auth_balancer");
             nextBalancer = loadBalancer("next_balancer");
@@ -133,11 +147,11 @@ public class YamlSettings implements BungeeSettings {
     @Override
     public Title getTitle(String id) {
         String key = "messages." + id;
-        String title = getOrDefault(String.class, key + ".title", id + ".title");
-        String subtitle = getOrDefault(String.class, key + ".subtitle", id + ".subtitle");
-        int fadeIn = getOrDefault(Integer.class, key + ".fade_in", 10);
-        int fadeOut = getOrDefault(Integer.class, key + ".fade_out", 10);
-        int stay = getOrDefault(Integer.class, key + ".stay", 30);
+        String title = getOrDefault(String.class, key + ".title", id + ".title", messages);
+        String subtitle = getOrDefault(String.class, key + ".subtitle", id + ".subtitle", messages);
+        int fadeIn = getOrDefault(Integer.class, key + ".fade_in", 10, messages);
+        int fadeOut = getOrDefault(Integer.class, key + ".fade_out", 10, messages);
+        int stay = getOrDefault(Integer.class, key + ".stay", 30, messages);
 
         return new BungeeTitle()
                 .title(new TextComponent(title))
@@ -149,10 +163,7 @@ public class YamlSettings implements BungeeSettings {
 
     @Override
     public String getMessage(String id) {
-        String key = "messages." + id;
-        if (!configuration.contains(key))
-            return id;
-        return configuration.getString(key);
+        return getOrDefault(String.class, "messages." + id, id, messages);
     }
 
     @Override
@@ -191,6 +202,11 @@ public class YamlSettings implements BungeeSettings {
     }
 
     @Override
+    public Boolean getDebug() {
+        return getOrDefault(Boolean.class, "debug", false);
+    }
+
+    @Override
     public List<String> getAuthServers() {
         return getList(String.class, "auth");
     }
@@ -204,5 +220,4 @@ public class YamlSettings implements BungeeSettings {
     public List<String> getNextServers() {
         return getList(String.class, "next");
     }
-
 }

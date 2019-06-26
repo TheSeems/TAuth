@@ -5,6 +5,7 @@ import java.util.UUID;
 public interface AuthServer {
     /**
      * Get ip of player
+     *
      * @param player to get ip of
      * @return ip
      */
@@ -12,6 +13,7 @@ public interface AuthServer {
 
     /**
      * Check whether player is online
+     *
      * @param player to check
      * @return result
      */

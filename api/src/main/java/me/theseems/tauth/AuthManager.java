@@ -12,13 +12,6 @@ public interface AuthManager {
     LoginResponse login(UUID player, String hash);
 
     /**
-     * Autologin call
-     * @param player to login
-     * @return response
-     */
-    LoginResponse autoLogin(UUID player);
-
-    /**
      * Register call
      * @param player to register
      * @param hash of password

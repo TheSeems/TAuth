@@ -7,7 +7,7 @@ import me.theseems.tauth.config.BungeeSettings;
 import me.theseems.tauth.config.YamlSettings;
 import me.theseems.tauth.db.JDBCDb;
 import me.theseems.tauth.db.MemoDb;
-import me.theseems.tauth.listeners.FirstJoinListener;
+import me.theseems.tauth.listeners.JoinListener;
 import me.theseems.tauth.listeners.LoginTeleportListener;
 import me.theseems.tauth.listeners.NextServerListener;
 import me.theseems.tauth.utils.Utils;
@@ -35,8 +35,9 @@ public class Main extends Plugin {
 
     private void loadSettings() {
         try {
-            File file = Utils.loadResource(this, "config.yml");
-            bungeeSettings = new YamlSettings(file);
+            File settings = Utils.loadResource(this, "config.yml");
+            File messages = Utils.loadResource(this, "messages.yml");
+            bungeeSettings = new YamlSettings(settings, messages);
         } catch (IOException e) {
             getLogger().warning("Error loading yaml settings");
             e.printStackTrace();
@@ -54,20 +55,26 @@ public class Main extends Plugin {
         server = this.getProxy();
         switch (bungeeSettings.getDbType()) {
             default:
-                getLogger().warning("Unknown db provider given: '" + bungeeSettings.getDbType() + "'. Using MEMORY db instead");
+                getLogger()
+                        .warning(
+                                "Unknown db provider given: '"
+                                        + bungeeSettings.getDbType()
+                                        + "'. Using MEMORY db instead");
                 TAuth.setDb(new MemoDb());
                 break;
             case "memo":
-                getLogger().warning("Selecting MEMORY db. This may be bad if you have a lot of players. Consider using postgres or anything else");
+                getLogger()
+                        .warning(
+                                "Selecting MEMORY db. This may be bad if you have a lot of players. Consider using postgres or anything else");
                 TAuth.setDb(new MemoDb());
                 break;
             case "jdbc":
                 getLogger().info("Using JDBC as AuthDb");
-                TAuth.setDb(new JDBCDb(
-                        bungeeSettings.getDbUrl(),
-                        bungeeSettings.getDbUser(),
-                        bungeeSettings.getDbPassword()
-                ));
+                TAuth.setDb(
+                        new JDBCDb(
+                                bungeeSettings.getDbUrl(),
+                                bungeeSettings.getDbUser(),
+                                bungeeSettings.getDbPassword()));
                 break;
         }
 
@@ -78,34 +85,49 @@ public class Main extends Plugin {
         TAuth.setAuthBalancer(bungeeSettings.getAuthBalancer());
         TAuth.setNextBalancer(bungeeSettings.getNextBalancer());
 
-        getLogger().info("Using " + getBungeeSettings().getAuthBalancer().getClass().getName() + " as auth pool balancer");
-        getLogger().info("Using " + getBungeeSettings().getNextBalancer().getClass().getName() + " as next pool balancer");
-        getLogger().info("Using " + getBungeeSettings().getHasher().getClass().getName() + " as password hasher");
+        getLogger()
+                .info(
+                        "Using "
+                                + getBungeeSettings().getAuthBalancer().getClass().getName()
+                                + " as auth pool balancer");
+        getLogger()
+                .info(
+                        "Using "
+                                + getBungeeSettings().getNextBalancer().getClass().getName()
+                                + " as next pool balancer");
+        getLogger()
+                .info(
+                        "Using "
+                                + getBungeeSettings().getHasher().getClass().getName()
+                                + " as password hasher");
 
         if (bungeeSettings.getNextServers() != null)
             TAuth.getNextBalancer().init(bungeeSettings.getNextServers());
         else
             // By default we return the player's current location
-            TAuth.setNextBalancer(new AuthBalancer() {
-                @Override
-                public String getServer(UUID player) {
-                    return server.getPlayer(player).getServer().getInfo().getName();
-                }
+            TAuth.setNextBalancer(
+                    new AuthBalancer() {
+                        @Override
+                        public String getServer(UUID player) {
+                            return server.getPlayer(player).getServer().getInfo().getName();
+                        }
 
-                @Override
-                public void init(List<String> serverList) {
-                    getLogger().warning("Next pool balancer is not presented!");
-                }
-            });
+                        @Override
+                        public void init(List<String> serverList) {
+                            getLogger().warning("Next pool balancer is not presented!");
+                        }
+                    });
 
         getProxy().getPluginManager().registerListener(this, new LoginTeleportListener());
         getProxy().getPluginManager().registerListener(this, new NextServerListener());
-        getProxy().getPluginManager().registerListener(this, new FirstJoinListener());
+        getProxy().getPluginManager().registerListener(this, new JoinListener());
 
         getProxy().getPluginManager().registerCommand(this, new LoginCommand());
         getProxy().getPluginManager().registerCommand(this, new RegisterCommand());
         getProxy().getPluginManager().registerCommand(this, new LogoutCommand());
 
-        getServer().getScheduler().schedule(this, new Checker(), 0, bungeeSettings.getCheckerPeriod(), TimeUnit.MILLISECONDS);
+        getServer()
+                .getScheduler()
+                .schedule(this, new Checker(), 0, bungeeSettings.getCheckerPeriod(), TimeUnit.MILLISECONDS);
     }
 }

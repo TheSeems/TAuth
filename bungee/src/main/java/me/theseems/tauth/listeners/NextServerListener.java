@@ -13,12 +13,11 @@ public class NextServerListener implements Listener {
     @EventHandler(priority = 0xf)
     public void onLogin(TLoginEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
-        FirstJoinListener.add(uuid);
 
-        ServerInfo info = Main.getServer()
-                .getServerInfo(TAuth.getNextBalancer().getServer(uuid));
+        ServerInfo info = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(uuid));
 
-        if (e.getPlayer().getServer() == null || !e.getPlayer().getServer().getInfo().getName().equals(info.getName()))
+        if (e.getPlayer().getServer() == null
+                || !e.getPlayer().getServer().getInfo().getName().equals(info.getName()))
             e.getPlayer().connect(info);
     }
 }
