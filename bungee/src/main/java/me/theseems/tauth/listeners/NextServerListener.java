@@ -10,14 +10,17 @@ import net.md_5.bungee.event.EventHandler;
 import java.util.UUID;
 
 public class NextServerListener implements Listener {
-    @EventHandler(priority = 0xf)
-    public void onLogin(TLoginEvent e) {
-        UUID uuid = e.getPlayer().getUniqueId();
+  @EventHandler(priority = 0xf)
+  public void onLogin(TLoginEvent e) {
+    if (Main.getBungeeSettings().getDebug()) System.out.println("TLoginEvent => " + e.toString());
+    UUID uuid = e.getPlayer().getUniqueId();
 
-        ServerInfo info = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(uuid));
+    ServerInfo info = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(uuid));
+    if (Main.getBungeeSettings().getDebug())
+      System.out.println("Balancer choose as next " + e.toString() + " for " + e.getPlayer().getName() + " (" + uuid + ")");
 
-        if (e.getPlayer().getServer() == null
-                || !e.getPlayer().getServer().getInfo().getName().equals(info.getName()))
-            e.getPlayer().connect(info);
-    }
+    if (e.getPlayer().getServer() == null
+      || !e.getPlayer().getServer().getInfo().getName().equals(info.getName()))
+      e.getPlayer().connect(info);
+  }
 }

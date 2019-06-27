@@ -54,10 +54,10 @@ public class TAuthManager implements AuthManager {
   @Override
   public void updateSession(UUID player) {
     TAuth.getDb()
-            .setSession(
-                    player,
-                    new TSession(
+      .setSession(
+        player,
+        new TSession(
                 LocalDateTime.now().plusSeconds(TAuth.getSettings().getExpireSeconds()),
-                            TAuth.getServer().getIp(player)));
+          TAuth.getServer().getIp(player)));
   }
 }

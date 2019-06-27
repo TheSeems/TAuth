@@ -31,8 +31,8 @@ public class JDBCDb implements AuthDB {
     try {
       Connection connection = pool.getConnection();
       PreparedStatement st =
-              connection.prepareStatement(
-                      "CREATE TABLE IF NOT EXISTS TAuth (uuid VARCHAR(40) PRIMARY KEY UNIQUE, hash VARCHAR(512), ip VARCHAR(20), expire timestamp)");
+        connection.prepareStatement(
+          "CREATE TABLE IF NOT EXISTS TAuth (uuid VARCHAR(40) PRIMARY KEY UNIQUE, hash VARCHAR(512), ip VARCHAR(20), expire timestamp)");
       st.execute();
       connection.close();
     } catch (SQLException e) {
@@ -45,7 +45,7 @@ public class JDBCDb implements AuthDB {
     try {
       Connection connection = getConnection();
       PreparedStatement statement =
-              connection.prepareStatement("INSERT INTO tauth VALUES (?, null, null, null)");
+        connection.prepareStatement("INSERT INTO tauth VALUES (?, null, null, null)");
       statement.setString(1, player.toString());
       statement.execute();
       statement.closeOnCompletion();
@@ -72,7 +72,7 @@ public class JDBCDb implements AuthDB {
     try {
       Connection connection = getConnection();
       PreparedStatement statement =
-              connection.prepareStatement("SELECT ip, expire FROM tauth WHERE uuid = ?");
+        connection.prepareStatement("SELECT ip, expire FROM tauth WHERE uuid = ?");
       statement.setString(1, player.toString());
       ResultSet set = statement.executeQuery();
       if (!set.next()) {
@@ -97,7 +97,7 @@ public class JDBCDb implements AuthDB {
     try {
       Connection connection = getConnection();
       PreparedStatement statement =
-              connection.prepareStatement("SELECT hash FROM tauth WHERE uuid = ?");
+        connection.prepareStatement("SELECT hash FROM tauth WHERE uuid = ?");
       statement.setString(1, player.toString());
       ResultSet set = statement.executeQuery();
       if (!set.next()) {
@@ -119,7 +119,7 @@ public class JDBCDb implements AuthDB {
     try {
       Connection connection = getConnection();
       PreparedStatement statement =
-              connection.prepareStatement("SELECT uuid FROM tauth WHERE uuid = ?");
+        connection.prepareStatement("SELECT uuid FROM tauth WHERE uuid = ?");
       statement.setString(1, player.toString());
       ResultSet set = statement.executeQuery();
       if (set.next()) {
@@ -139,7 +139,7 @@ public class JDBCDb implements AuthDB {
       initPlayer(player);
       Connection connection = getConnection();
       PreparedStatement statement =
-              connection.prepareStatement("UPDATE tauth SET hash=? WHERE uuid=?");
+        connection.prepareStatement("UPDATE tauth SET hash=? WHERE uuid=?");
       statement.setString(1, hash);
       statement.setString(2, player.toString());
       statement.execute();
@@ -156,7 +156,7 @@ public class JDBCDb implements AuthDB {
       initPlayer(player);
       Connection connection = getConnection();
       PreparedStatement statement =
-              connection.prepareStatement("UPDATE tauth SET ip=?, expire=? WHERE uuid=?");
+        connection.prepareStatement("UPDATE tauth SET ip=?, expire=? WHERE uuid=?");
       statement.setString(1, session.getIp());
       statement.setTimestamp(2, Timestamp.valueOf(session.getExpire()));
       statement.setString(3, player.toString());

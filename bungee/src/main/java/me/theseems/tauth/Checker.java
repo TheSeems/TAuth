@@ -10,11 +10,13 @@ public class Checker implements Runnable {
   private static Map<UUID, Date> kick = new HashMap<>();
 
   private static void displayLocal(UUID uuid, RegisterResponse response) {
+    if (Main.getBungeeSettings().getDebug()) System.out.println("Displaying " + response + " (register) for " + uuid);
     ProxiedPlayer player = Main.getServer().getPlayer(uuid);
     player.sendTitle(Main.getBungeeSettings().getTitle("register.titles." + response.name()));
   }
 
   private static void displayLocal(UUID uuid, LoginResponse response) {
+    if (Main.getBungeeSettings().getDebug()) System.out.println("Displaying " + response + " (login) for " + uuid);
     ProxiedPlayer player = Main.getServer().getPlayer(uuid);
     player.sendTitle(Main.getBungeeSettings().getTitle("login.titles." + response.name()));
   }
@@ -60,7 +62,7 @@ public class Checker implements Runnable {
         if (!checkForKick(player, uuid)) return;
 
         if (player.getServer() == null
-                || !Main.getBungeeSettings()
+          || !Main.getBungeeSettings()
                 .getAuthServers()
                 .contains(player.getServer().getInfo().getName())) {
           String to = TAuth.getAuthBalancer().getServer(uuid);

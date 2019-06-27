@@ -13,35 +13,41 @@ import java.util.UUID;
 
 public class LoginTeleportListener implements Listener {
 
-    @EventHandler
-    public void onLogin(ServerConnectEvent e) {
-        UUID player = e.getPlayer().getUniqueId();
-        boolean joinAuth = TAuth.getSettings().getAuthServers().contains(e.getTarget().getName());
-        LoginResponse response = TAuth.getManager().isAutheticated(player);
+  @EventHandler
+  public void onLogin(ServerConnectEvent e) {
+    UUID player = e.getPlayer().getUniqueId();
+    boolean joinAuth = TAuth.getSettings().getAuthServers().contains(e.getTarget().getName());
+    LoginResponse response = TAuth.getManager().isAutheticated(player);
 
-        if (Main.getBungeeSettings().getDebug())
-            System.out.println(
-                    e.getPlayer().getUniqueId()
-                            + " to "
-                            + e.getTarget().getName()
-                            + " with "
-                            + response
-                            + " (JA = "
-                            + joinAuth
-                            + ")");
+    if (Main.getBungeeSettings().getDebug())
+      System.out.println(
+        e.getPlayer().getUniqueId()
+          + " to "
+          + e.getTarget().getName()
+          + " with "
+          + response
+          + " (JA = "
+          + joinAuth
+          + ")");
 
-        if (response != LoginResponse.OK) {
-            Checker.display(player, TAuth.getManager().isAutheticated(player));
+    if (response != LoginResponse.OK) {
+      Checker.display(player, TAuth.getManager().isAutheticated(player));
 
-            if (e.getPlayer().getServer() == null)
-                e.setTarget(Main.getServer().getServerInfo(TAuth.getAuthBalancer().getServer(player)));
-            else e.setCancelled(!joinAuth);
+      if (e.getPlayer().getServer() == null)
+        e.setTarget(Main.getServer().getServerInfo(TAuth.getAuthBalancer().getServer(player)));
+      else e.setCancelled(!joinAuth);
 
-        } else if (!Main.getBungeeSettings().getDebug() && joinAuth) {
-            ServerInfo to = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(player));
+    } else if (!(Main.getBungeeSettings().getDebug() && e.getPlayer().hasPermission("tauth.admin"))
+      && joinAuth) {
 
-            if (!to.getName().equals(e.getPlayer().getServer().getInfo().getName())) e.setTarget(to);
-            else e.setCancelled(true);
-        }
+      ServerInfo to = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(player));
+      if (Main.getBungeeSettings().getDebug())
+        System.out.println("Balancer choose as next " + e.toString() + " for " + e.getPlayer().getName() + " (" + player + ")");
+
+      ServerInfo current = e.getPlayer().getServer().getInfo();
+
+      if (current == null || !to.getName().equals(current.getName())) e.setTarget(to);
+      else e.setCancelled(true);
     }
+  }
 }
