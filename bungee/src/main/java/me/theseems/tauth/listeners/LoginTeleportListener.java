@@ -51,7 +51,7 @@ public class LoginTeleportListener implements Listener {
           + player
           + ")");
 
-      ServerInfo current = e.getPlayer().getServer().getInfo();
+      ServerInfo current = e.getPlayer().getServer() == null ? null : e.getPlayer().getServer().getInfo();
       debug("[LTL] connecting to " + to);
 
       if (current == null || !to.getName().equals(current.getName())) e.setTarget(to);
