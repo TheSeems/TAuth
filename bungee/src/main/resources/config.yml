@@ -7,6 +7,9 @@ auth:
 next:
   - instance
 
+# Force teleport player to the next balanced server
+force_next: false
+
 # Server info update period in seconds
 update_period: 30
 

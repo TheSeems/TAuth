@@ -207,6 +207,11 @@ public class YamlSettings implements BungeeSettings {
   }
 
   @Override
+  public Boolean getForceNext() {
+    return getOrDefault(Boolean.class, "force_next", false);
+  }
+
+  @Override
   public List<String> getAuthServers() {
     return getList(String.class, "auth");
   }

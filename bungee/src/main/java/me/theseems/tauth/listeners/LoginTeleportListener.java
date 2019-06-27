@@ -11,6 +11,8 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.util.UUID;
 
+import static me.theseems.tauth.Main.debug;
+
 public class LoginTeleportListener implements Listener {
 
   @EventHandler
@@ -19,8 +21,7 @@ public class LoginTeleportListener implements Listener {
     boolean joinAuth = TAuth.getSettings().getAuthServers().contains(e.getTarget().getName());
     LoginResponse response = TAuth.getManager().isAutheticated(player);
 
-    if (Main.getBungeeSettings().getDebug())
-      System.out.println(
+    debug(
         e.getPlayer().getUniqueId()
           + " to "
           + e.getTarget().getName()
@@ -41,10 +42,17 @@ public class LoginTeleportListener implements Listener {
       && joinAuth) {
 
       ServerInfo to = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(player));
-      if (Main.getBungeeSettings().getDebug())
-        System.out.println("Balancer choose as next " + e.toString() + " for " + e.getPlayer().getName() + " (" + player + ")");
+      debug(
+        "Balancer choose as next "
+          + e.toString()
+          + " for "
+          + e.getPlayer().getName()
+          + " ("
+          + player
+          + ")");
 
       ServerInfo current = e.getPlayer().getServer().getInfo();
+      debug("[LTL] connecting to " + to);
 
       if (current == null || !to.getName().equals(current.getName())) e.setTarget(to);
       else e.setCancelled(true);

@@ -20,10 +20,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main extends Plugin {
   private static ProxyServer server;
   private static BungeeSettings bungeeSettings;
+  private static Logger logger;
 
   public static BungeeSettings getBungeeSettings() {
     return bungeeSettings;
@@ -42,6 +44,11 @@ public class Main extends Plugin {
       getLogger().warning("Error loading yaml settings");
       e.printStackTrace();
     }
+  }
+
+  public static void debug(String... msg) {
+    if (bungeeSettings.getDebug())
+      for (String message : msg) logger.log(Level.INFO, "[DEBUG] " + message);
   }
 
   @Override
@@ -77,6 +84,8 @@ public class Main extends Plugin {
             bungeeSettings.getDbPassword()));
         break;
     }
+
+    logger = getLogger();
 
     TAuth.setManager(new TAuthManager());
     TAuth.setServer(new BungeeAuthServer(this));

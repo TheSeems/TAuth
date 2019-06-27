@@ -11,6 +11,8 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.util.UUID;
 
+import static me.theseems.tauth.Main.debug;
+
 public class JoinListener implements Listener {
   @EventHandler
   public void onLogin(ServerConnectEvent e) {
@@ -18,6 +20,7 @@ public class JoinListener implements Listener {
 
     if (e.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)
       && TAuth.getManager().isAutheticated(player) == LoginResponse.OK) {
+      debug("Auto logined " + player);
       Checker.display(player, LoginResponse.OK);
       Main.getServer().getPluginManager().callEvent(new TLoginEvent(e.getPlayer(), true));
     }

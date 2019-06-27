@@ -5,18 +5,20 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
 
+import static me.theseems.tauth.Main.debug;
+
 public class Checker implements Runnable {
   private static Set<UUID> duplicate = new HashSet<>();
   private static Map<UUID, Date> kick = new HashMap<>();
 
   private static void displayLocal(UUID uuid, RegisterResponse response) {
-    if (Main.getBungeeSettings().getDebug()) System.out.println("Displaying " + response + " (register) for " + uuid);
+    debug("Displaying " + response + " (register) for " + uuid);
     ProxiedPlayer player = Main.getServer().getPlayer(uuid);
     player.sendTitle(Main.getBungeeSettings().getTitle("register.titles." + response.name()));
   }
 
   private static void displayLocal(UUID uuid, LoginResponse response) {
-    if (Main.getBungeeSettings().getDebug()) System.out.println("Displaying " + response + " (login) for " + uuid);
+    debug("Displaying " + response + " (login) for " + uuid);
     ProxiedPlayer player = Main.getServer().getPlayer(uuid);
     player.sendTitle(Main.getBungeeSettings().getTitle("login.titles." + response.name()));
   }

@@ -98,4 +98,11 @@ public interface BungeeSettings extends Settings {
    * @return debug
    */
   Boolean getDebug();
+
+  /**
+   * If we force need to send player to lobby
+   *
+   * @return force
+   */
+  Boolean getForceNext();
 }
