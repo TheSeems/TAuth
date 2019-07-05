@@ -9,16 +9,34 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.util.UUID;
 
+import static me.theseems.tauth.Main.debug;
+
 public class NextServerListener implements Listener {
-    @EventHandler(priority = 0xf)
-    public void onLogin(TLoginEvent e) {
-        UUID uuid = e.getPlayer().getUniqueId();
-        FirstJoinListener.add(uuid);
-
-        ServerInfo info = Main.getServer()
-                .getServerInfo(TAuth.getNextBalancer().getServer(uuid));
-
-        if (e.getPlayer().getServer() == null || !e.getPlayer().getServer().getInfo().getName().equals(info.getName()))
-            e.getPlayer().connect(info);
+  @EventHandler
+  public void onLogin(TLoginEvent e) {
+    debug("TLoginEvent => " + e.toString());
+    UUID uuid = e.getPlayer().getUniqueId();
+    String current =
+      e.getPlayer().getServer() != null ? e.getPlayer().getServer().getInfo().getName() : null;
+    // Force next check
+    if (!Main.getBungeeSettings().getForceNext()) {
+      debug("Passing...");
+      return;
     }
+
+    debug("Force connecting... (current = " + current + ")");
+
+    ServerInfo info = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(uuid));
+    debug(
+      "Balancer choose as next "
+        + e.toString()
+        + " for "
+        + e.getPlayer().getName()
+        + " ("
+        + uuid
+        + ") => "
+        + info.getName());
+
+    if (current == null || !current.equals(info.getName())) e.getPlayer().connect(info);
+  }
 }

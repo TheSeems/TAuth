@@ -1,6 +1,8 @@
 package me.theseems.tauth.tests;
 
 import me.theseems.tauth.*;
+import me.theseems.tauth.db.MemoDb;
+import me.theseems.tauth.hashers.SHA512AuthHasher;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -12,23 +14,24 @@ class RegisterTest {
 
     RegisterTest() {
         TAuth.setHasher(new SHA512AuthHasher());
-        TAuth.setDb(new MemAuthDB());
+        TAuth.setDb(new MemoDb());
         TAuth.setManager(new TAuthManager());
-        TAuth.setSettings(new Settings() {
-            @Override
-            public List<String> getAuthServers() {
-                return null;
-            }
+        TAuth.setSettings(
+                new Settings() {
+                    @Override
+                    public List<String> getAuthServers() {
+                        return null;
+                    }
 
-            @Override
-            public Integer getExpireSeconds() {
-                return 24 * 1000;
-            }
+                    @Override
+                    public Integer getExpireSeconds() {
+                        return 24 * 1000;
+                    }
 
-            @Override
-            public List<String> getNextServers() {
-                return null;
-            }
+                    @Override
+                    public List<String> getNextServers() {
+                        return null;
+                    }
         });
     }
 
@@ -41,37 +44,39 @@ class RegisterTest {
 
     @Test
     void testRegister() {
-        AuthServer one = new AuthServer() {
-            @Override
-            public String getIp(UUID player) {
-                return "one";
-            }
+        AuthServer one =
+                new AuthServer() {
+                    @Override
+                    public String getIp(UUID player) {
+                        return "one";
+                    }
 
-            @Override
-            public boolean isOnline(UUID player) {
-                return true;
-            }
+                    @Override
+                    public boolean isOnline(UUID player) {
+                        return true;
+                    }
 
-            @Override
-            public int getOnline(String server) {
-                return 0;
-            }
+                    @Override
+                    public int getOnline(String server) {
+                        return 0;
+                    }
         };
-        AuthServer another = new AuthServer() {
-            @Override
-            public String getIp(UUID player) {
-                return "another";
-            }
+        AuthServer another =
+                new AuthServer() {
+                    @Override
+                    public String getIp(UUID player) {
+                        return "another";
+                    }
 
-            @Override
-            public boolean isOnline(UUID player) {
-                return true;
-            }
+                    @Override
+                    public boolean isOnline(UUID player) {
+                        return true;
+                    }
 
-            @Override
-            public int getOnline(String server) {
-                return 0;
-            }
+                    @Override
+                    public int getOnline(String server) {
+                        return 0;
+                    }
         };
 
         TAuth.setServer(one);
@@ -80,26 +85,26 @@ class RegisterTest {
         assertTrue(TAuth.getServer().isOnline(player));
         assertFalse(TAuth.getDb().exist(player));
         assertEquals(TAuth.getManager().login(player, "some"), LoginResponse.UNREGISTERED);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.UNREGISTERED);
+        assertEquals(TAuth.getManager().isAutheticated(player), LoginResponse.UNREGISTERED);
 
         String hashed = TAuth.getHasher().hash("sdafnbasjdkf mnkads fjk asdjkf asjd fjkas df");
         assertEquals(TAuth.getManager().register(player, hashed), RegisterResponse.OK);
         assertEquals(TAuth.getManager().register(player, hashed), RegisterResponse.REGISTERED);
 
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().isAutheticated(player));
         TAuth.setServer(another);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.EXPIRED);
+        assertEquals(LoginResponse.EXPIRED, TAuth.getManager().isAutheticated(player));
 
         TAuth.setServer(one);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().isAutheticated(player));
 
         TAuth.setServer(another);
-        assertEquals(TAuth.getManager().login(player, hashed), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().login(player, hashed));
 
         TAuth.setServer(another);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.OK);
+        assertEquals(LoginResponse.OK, TAuth.getManager().isAutheticated(player));
 
         TAuth.setServer(one);
-        assertEquals(TAuth.getManager().autoLogin(player), LoginResponse.EXPIRED);
+        assertEquals(LoginResponse.EXPIRED, TAuth.getManager().isAutheticated(player));
     }
 }

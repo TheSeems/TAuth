@@ -1,0 +1,41 @@
+# Localization
+messages:
+  login:
+    usage: '§eUsage§7: §e/login §7<pass>'
+    titles:
+      UNREGISTERED:
+        title: §7Please, register
+        subtitle: §e/register §7<pass> <pass>
+        fade_in: 10
+        fade_out: 10
+        stay: 30
+      EXPIRED:
+        title: §7Please, login
+        subtitle: §e/login §7<pass>
+        fade_in: 10
+        fade_out: 10
+        stay: 30
+      FORBIDDEN:
+        title: §cWrong password!
+        subtitle: ''
+        fade_in: 10
+        fade_out: 10
+        stay: 30
+      OK:
+        title: §aYou are logged in
+        subtitle: ''
+        fade_in: 10
+        fade_out: 10
+        stay: 30
+  register:
+    titles:
+      OK:
+        title: §aYou are registered
+        subtitle: ''
+        fade_in: 10
+        fade_out: 10
+        stay: 30
+    usage: "§eUsage§7 §e/register §7<pass> <repeat-pass>"
+    no_match: "§7Passwords §cdont match"
+  kick:
+    timed_out: §c§lYou have run out of time to log in
