@@ -85,4 +85,5 @@ expire: 7200
  ```
  
  ## TODO
+  - Autologin licensed people
   - Other kinds of login/register (2 factor auth, register from social networks)
