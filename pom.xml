@@ -4,67 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.theseems.tauth</groupId>
+    <groupId>me.theseems</groupId>
     <artifactId>TAuth</artifactId>
     <packaging>pom</packaging>
-    <name>PARENT - ${project.artifactId}</name>
+    <name>TAuth</name>
     <version>0.1D</version>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>1.2.2</version>
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>shade</goal>
-                            </goals>
-                            <configuration>
-                                <artifactSet>
-                                    <excludes>
-                                        <exclude>classworlds:classworlds</exclude>
-                                        <exclude>junit:junit</exclude>
-                                        <exclude>jmock:jmock</exclude>
-                                        <exclude>xml-apis:xml-apis</exclude>
-                                    </excludes>
-                                </artifactSet>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <mainClass>me.theseems.tauth.Main</mainClass>
-                            </manifest>
-                        </archive>
-                        <descriptorRefs>
-                            <descriptorRef>jar-with-dependencies</descriptorRef>
-                        </descriptorRefs>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-
     <modules>
-        <module>api</module>
-        <module>bungee</module>
-        <module>common</module>
+        <module>tauth-api</module>
+        <module>tauth-common</module>
+        <module>tauth-bungee</module>
     </modules>
 
 

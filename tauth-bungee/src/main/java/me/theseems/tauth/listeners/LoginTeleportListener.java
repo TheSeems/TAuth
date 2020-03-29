@@ -5,6 +5,9 @@ import me.theseems.tauth.LoginResponse;
 import me.theseems.tauth.Main;
 import me.theseems.tauth.TAuth;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.ChatEvent;
+import net.md_5.bungee.api.event.PermissionCheckEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -15,21 +18,48 @@ import static me.theseems.tauth.Main.debug;
 
 public class LoginTeleportListener implements Listener {
 
-  @EventHandler
+  @EventHandler(priority = Byte.MAX_VALUE)
+  public void onPermissionEvent(PermissionCheckEvent e) {
+    if (!(e.getSender() instanceof ProxiedPlayer)) {
+      return;
+    }
+
+    LoginResponse response =
+      TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
+    if (response != LoginResponse.OK) {
+      e.setHasPermission(false);
+    }
+  }
+
+  @EventHandler(priority = Byte.MAX_VALUE)
+  public void on(ChatEvent e) {
+    if (e.getSender() instanceof ProxiedPlayer) {
+      LoginResponse response =
+        TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
+      if (response != LoginResponse.OK) {
+        e.setCancelled(
+          !(e.isCommand()
+            && (e.getMessage().startsWith("/register")
+            || e.getMessage().startsWith("/login"))));
+      }
+    }
+  }
+
+  @EventHandler(priority = Byte.MAX_VALUE)
   public void onLogin(ServerConnectEvent e) {
     UUID player = e.getPlayer().getUniqueId();
     boolean joinAuth = TAuth.getSettings().getAuthServers().contains(e.getTarget().getName());
     LoginResponse response = TAuth.getManager().isAutheticated(player);
 
     debug(
-        e.getPlayer().getUniqueId()
-          + " to "
-          + e.getTarget().getName()
-          + " with "
-          + response
-          + " (JA = "
-          + joinAuth
-          + ")");
+      e.getPlayer().getUniqueId()
+        + " to "
+        + e.getTarget().getName()
+        + " with "
+        + response
+        + " (JA = "
+        + joinAuth
+        + ")");
 
     if (response != LoginResponse.OK) {
       Checker.display(player, TAuth.getManager().isAutheticated(player));
@@ -51,7 +81,8 @@ public class LoginTeleportListener implements Listener {
           + player
           + ")");
 
-      ServerInfo current = e.getPlayer().getServer() == null ? null : e.getPlayer().getServer().getInfo();
+      ServerInfo current =
+        e.getPlayer().getServer() == null ? null : e.getPlayer().getServer().getInfo();
       debug("[LTL] connecting to " + to);
 
       if (current == null || !to.getName().equals(current.getName())) e.setTarget(to);

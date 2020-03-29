@@ -6,9 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api" />
-        <module name="common" />
-        <module name="bungee" />
+        <module name="tauth-common" />
+        <module name="tauth-api" />
+        <module name="tauth-bungee" />
       </profile>
     </annotationProcessing>
   </component>
