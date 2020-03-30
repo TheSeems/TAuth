@@ -4,6 +4,8 @@ import me.theseems.tauth.Checker;
 import me.theseems.tauth.LoginResponse;
 import me.theseems.tauth.Main;
 import me.theseems.tauth.TAuth;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -37,10 +39,16 @@ public class LoginTeleportListener implements Listener {
       LoginResponse response =
         TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
       if (response != LoginResponse.OK) {
-        e.setCancelled(
+        boolean shouldCancel =
           !(e.isCommand()
-            && (e.getMessage().startsWith("/register")
-            || e.getMessage().startsWith("/login"))));
+            && (e.getMessage().startsWith("/register") || e.getMessage().startsWith("/login")));
+        if (shouldCancel) {
+          ((ProxiedPlayer) e.getSender())
+            .sendMessage(
+              ChatMessageType.ACTION_BAR,
+              new TextComponent(Main.getBungeeSettings().getMessage("on.command")));
+          e.setCancelled(true);
+        }
       }
     }
   }

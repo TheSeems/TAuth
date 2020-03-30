@@ -37,5 +37,7 @@ messages:
         stay: 30
     usage: "§eUsage§7 §e/register §7<pass> <repeat-pass>"
     no_match: "§7Passwords §cdont match"
+  on:
+    command: "§cPlease, log in before using chat!"
   kick:
     timed_out: §c§lYou have run out of time to log in

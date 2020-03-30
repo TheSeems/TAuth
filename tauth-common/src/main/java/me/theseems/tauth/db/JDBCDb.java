@@ -123,9 +123,11 @@ public class JDBCDb implements AuthDB {
       statement.setString(1, player.toString());
       ResultSet set = statement.executeQuery();
       if (set.next()) {
+        statement.close();
         connection.close();
         return true;
       }
+      statement.close();
       connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
