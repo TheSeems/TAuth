@@ -20,9 +20,6 @@ public class JDBCDb implements AuthDB {
     config.setJdbcUrl(host);
     config.setUsername(user);
     config.setPassword(password);
-    config.addDataSourceProperty("cachePrepStmts", "true");
-    config.addDataSourceProperty("prepStmtCacheSize", "250");
-    config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
     pool = new HikariPool(config);
     init();
   }
@@ -48,7 +45,6 @@ public class JDBCDb implements AuthDB {
         connection.prepareStatement("INSERT INTO tauth VALUES (?, null, null, null)");
       statement.setString(1, player.toString());
       statement.execute();
-      statement.closeOnCompletion();
       connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -123,11 +119,10 @@ public class JDBCDb implements AuthDB {
       statement.setString(1, player.toString());
       ResultSet set = statement.executeQuery();
       if (set.next()) {
-        statement.close();
         connection.close();
         return true;
       }
-      statement.close();
+
       connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -145,7 +140,6 @@ public class JDBCDb implements AuthDB {
       statement.setString(1, hash);
       statement.setString(2, player.toString());
       statement.execute();
-      statement.closeOnCompletion();
       connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -163,7 +157,6 @@ public class JDBCDb implements AuthDB {
       statement.setTimestamp(2, Timestamp.valueOf(session.getExpire()));
       statement.setString(3, player.toString());
       statement.execute();
-      statement.closeOnCompletion();
       connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
