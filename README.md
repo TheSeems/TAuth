@@ -13,6 +13,7 @@ Without logining for certain time interval
 This feature allows you to spread your players to auth lobbies and main lobbies efficiently
 
 ## API
+[![](https://jitpack.io/v/theseems/tauth.svg)](https://jitpack.io/#theseems/tauth)
 Check if player is authenticated  
 Login for a player  
 Register for a player  
