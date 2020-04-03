@@ -20,6 +20,7 @@ public class JDBCDb implements AuthDB {
     config.setJdbcUrl(host);
     config.setUsername(user);
     config.setPassword(password);
+    config.setLeakDetectionThreshold(60 * 1000);
     pool = new HikariPool(config);
     init();
   }
@@ -29,7 +30,7 @@ public class JDBCDb implements AuthDB {
       Connection connection = pool.getConnection();
       PreparedStatement st =
         connection.prepareStatement(
-          "CREATE TABLE IF NOT EXISTS TAuth (uuid VARCHAR(40) PRIMARY KEY UNIQUE, hash VARCHAR(512), ip VARCHAR(20), expire timestamp)");
+          "CREATE TABLE IF NOT EXISTS TAuth (uuid VARCHAR(140) PRIMARY KEY UNIQUE, hash VARCHAR(512), ip VARCHAR(60), expire timestamp)");
       st.execute();
       connection.close();
     } catch (SQLException e) {
@@ -39,13 +40,11 @@ public class JDBCDb implements AuthDB {
 
   private void initPlayer(UUID player) {
     if (exist(player)) return;
-    try {
-      Connection connection = getConnection();
+    try (Connection connection = getConnection()) {
       PreparedStatement statement =
-        connection.prepareStatement("INSERT INTO tauth VALUES (?, null, null, null)");
+        connection.prepareStatement("INSERT INTO TAuth VALUES (?, null, null, null)");
       statement.setString(1, player.toString());
       statement.execute();
-      connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -65,24 +64,26 @@ public class JDBCDb implements AuthDB {
   public Optional<Session> getSession(UUID player) {
     if (!exist(player)) return Optional.empty();
 
-    try {
-      Connection connection = getConnection();
-      PreparedStatement statement =
-        connection.prepareStatement("SELECT ip, expire FROM tauth WHERE uuid = ?");
-      statement.setString(1, player.toString());
-      ResultSet set = statement.executeQuery();
-      if (!set.next()) {
-        connection.close();
-        throw new IllegalStateException("Session must be presented if player exists");
-      }
+    try (Connection connection = getConnection()) {
+      Statement statement = connection.createStatement();
+      ResultSet set =
+        statement.executeQuery(
+          "SELECT ip, expire FROM TAuth WHERE uuid = '" + player.toString() + "'");
 
-      String ip = set.getString("ip");
-      LocalDateTime expire = set.getTimestamp("expire").toLocalDateTime();
-      connection.close();
-      return Optional.of(new TSession(expire, ip));
+      if (set.next()) {
+        if (set.getString("ip") == null || set.getTimestamp("expire") == null) {
+          clearSession(player);
+          return Optional.empty();
+        }
+
+        String ip = set.getString("ip");
+        LocalDateTime expire = set.getTimestamp("expire").toLocalDateTime();
+        return Optional.of(new TSession(expire, ip));
+      }
     } catch (SQLException e) {
       e.printStackTrace();
     }
+
     return Optional.empty();
   }
 
@@ -90,20 +91,17 @@ public class JDBCDb implements AuthDB {
   public Optional<String> getHash(UUID player) {
     if (!exist(player)) return Optional.empty();
 
-    try {
-      Connection connection = getConnection();
-      PreparedStatement statement =
-        connection.prepareStatement("SELECT hash FROM tauth WHERE uuid = ?");
-      statement.setString(1, player.toString());
-      ResultSet set = statement.executeQuery();
-      if (!set.next()) {
-        connection.close();
-        throw new IllegalStateException("Hash must be presented if player exists");
-      }
+    try (Connection connection = getConnection()) {
+      Statement statement = connection.createStatement();
+      ResultSet set =
+        statement.executeQuery("SELECT hash FROM TAuth WHERE uuid = '" + player.toString() + "'");
 
-      String str = set.getString("hash");
-      connection.close();
-      return Optional.of(str);
+      if (set.next()) {
+        String str = set.getString("hash");
+        set.close();
+        connection.close();
+        return Optional.of(str);
+      }
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -112,18 +110,13 @@ public class JDBCDb implements AuthDB {
 
   @Override
   public boolean exist(UUID player) {
-    try {
-      Connection connection = getConnection();
-      PreparedStatement statement =
-        connection.prepareStatement("SELECT uuid FROM tauth WHERE uuid = ?");
-      statement.setString(1, player.toString());
-      ResultSet set = statement.executeQuery();
+    try (Connection connection = getConnection()) {
+      Statement statement = connection.createStatement();
+      ResultSet set =
+        statement.executeQuery("SELECT uuid FROM TAuth WHERE uuid = '" + player.toString() + "'");
       if (set.next()) {
-        connection.close();
         return true;
       }
-
-      connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -132,15 +125,13 @@ public class JDBCDb implements AuthDB {
 
   @Override
   public void setHash(UUID player, String hash) {
-    try {
-      initPlayer(player);
-      Connection connection = getConnection();
+    initPlayer(player);
+    try (Connection connection = getConnection()) {
       PreparedStatement statement =
-        connection.prepareStatement("UPDATE tauth SET hash=? WHERE uuid=?");
+        connection.prepareStatement("UPDATE TAuth SET hash=? WHERE uuid=?");
       statement.setString(1, hash);
       statement.setString(2, player.toString());
       statement.execute();
-      connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -148,16 +139,14 @@ public class JDBCDb implements AuthDB {
 
   @Override
   public void setSession(UUID player, Session session) {
-    try {
-      initPlayer(player);
-      Connection connection = getConnection();
+    initPlayer(player);
+    try (Connection connection = getConnection()) {
       PreparedStatement statement =
-        connection.prepareStatement("UPDATE tauth SET ip=?, expire=? WHERE uuid=?");
+        connection.prepareStatement("UPDATE TAuth SET ip=?, expire=? WHERE uuid=?");
       statement.setString(1, session.getIp());
       statement.setTimestamp(2, Timestamp.valueOf(session.getExpire()));
       statement.setString(3, player.toString());
       statement.execute();
-      connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
     }

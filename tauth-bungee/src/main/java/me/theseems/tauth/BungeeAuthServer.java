@@ -23,7 +23,7 @@ public class BungeeAuthServer implements AuthServer, Runnable {
 
   @Override
   public String getIp(UUID player) {
-    return server.getPlayer(player).getAddress().getHostName();
+    return server.getPlayer(player).getAddress().getAddress().getHostAddress();
   }
 
   @Override

@@ -14,13 +14,21 @@ public class Checker implements Runnable {
   private static void displayLocal(UUID uuid, RegisterResponse response) {
     debug("Displaying " + response + " (register) for " + uuid);
     ProxiedPlayer player = Main.getServer().getPlayer(uuid);
-    player.sendTitle(Main.getBungeeSettings().getTitle("register.titles." + response.name()));
+    if (player != null)
+      player.sendTitle(Main.getBungeeSettings().getTitle("register.titles." + response.name()));
   }
 
   private static void displayLocal(UUID uuid, LoginResponse response) {
-    debug("Displaying " + response + " (login) for " + uuid);
+    debug(
+      "Displaying "
+        + response
+        + " (login) for "
+        + uuid
+        + " -> "
+        + Main.getBungeeSettings().getTitle("login.titles." + response.name()));
     ProxiedPlayer player = Main.getServer().getPlayer(uuid);
-    player.sendTitle(Main.getBungeeSettings().getTitle("login.titles." + response.name()));
+    if (player != null)
+      player.sendTitle(Main.getBungeeSettings().getTitle("login.titles." + response.name()));
   }
 
   public static void display(UUID uuid, RegisterResponse response) {
@@ -65,8 +73,8 @@ public class Checker implements Runnable {
 
         if (player.getServer() == null
           || !Main.getBungeeSettings()
-                .getAuthServers()
-                .contains(player.getServer().getInfo().getName())) {
+          .getAuthServers()
+          .contains(player.getServer().getInfo().getName())) {
           String to = TAuth.getAuthBalancer().getServer(uuid);
           player.connect(Main.getServer().getServerInfo(to));
         }
