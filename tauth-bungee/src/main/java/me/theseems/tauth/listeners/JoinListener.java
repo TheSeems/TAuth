@@ -14,15 +14,20 @@ import java.util.UUID;
 import static me.theseems.tauth.Main.debug;
 
 public class JoinListener implements Listener {
-  @EventHandler
+  @EventHandler(priority = 0b1111111)
   public void onLogin(ServerConnectEvent e) {
     UUID player = e.getPlayer().getUniqueId();
-
     if (e.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)
       && TAuth.getManager().isAutheticated(player) == LoginResponse.OK) {
-      debug("Auto logined " + player);
-      Checker.display(player, LoginResponse.OK);
-      Main.getServer().getPluginManager().callEvent(new TLoginEvent(e.getPlayer(), true));
+      TLoginEvent event = new TLoginEvent(e.getPlayer(), true);
+      Main.getServer().getPluginManager().callEvent(event);
+
+      if (!event.isCancelled()) {
+        Checker.display(player, LoginResponse.OK);
+        debug("Auto logined " + player);
+      } else {
+        TAuth.getDb().clearSession(e.getPlayer().getUniqueId());
+      }
     }
   }
 }

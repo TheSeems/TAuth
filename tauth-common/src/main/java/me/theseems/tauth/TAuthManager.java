@@ -6,6 +6,14 @@ import java.util.UUID;
 
 public class TAuthManager implements AuthManager {
 
+  boolean loginHookup(UUID player) {
+    return true;
+  }
+
+  boolean registerHookup(UUID player) {
+    return true;
+  }
+
   @Override
   public LoginResponse login(UUID player, String hash) {
     if (!TAuth.getServer().isOnline(player)) return LoginResponse.INCORRECT;
@@ -15,8 +23,11 @@ public class TAuthManager implements AuthManager {
     if (!TAuth.getDb().getHash(player).get().equals(hash)) {
       return LoginResponse.FORBIDDEN;
     } else {
-      updateSession(player);
-      return LoginResponse.OK;
+      if (loginHookup(player)) {
+        updateSession(player);
+        return LoginResponse.OK;
+      }
+      return LoginResponse.INCORRECT;
     }
   }
 
@@ -24,9 +35,13 @@ public class TAuthManager implements AuthManager {
   public RegisterResponse register(UUID player, String hash) {
     if (!TAuth.getServer().isOnline(player)) return RegisterResponse.INCORRECT;
     if (TAuth.getDb().exist(player)) return RegisterResponse.REGISTERED;
-    TAuth.getDb().setHash(player, hash);
-    updateSession(player);
-    return RegisterResponse.OK;
+
+    if (registerHookup(player)) {
+      TAuth.getDb().setHash(player, hash);
+      updateSession(player);
+      return RegisterResponse.OK;
+    } else
+      return RegisterResponse.INCORRECT;
   }
 
   @Override
@@ -57,7 +72,7 @@ public class TAuthManager implements AuthManager {
       .setSession(
         player,
         new TSession(
-                LocalDateTime.now().plusSeconds(TAuth.getSettings().getExpireSeconds()),
+          LocalDateTime.now().plusSeconds(TAuth.getSettings().getExpireSeconds()),
           TAuth.getServer().getIp(player)));
   }
 }

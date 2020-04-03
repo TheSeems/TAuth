@@ -4,7 +4,6 @@ import me.theseems.tauth.Checker;
 import me.theseems.tauth.LoginResponse;
 import me.theseems.tauth.Main;
 import me.theseems.tauth.TAuth;
-import me.theseems.tauth.events.TLoginEvent;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Command;
@@ -33,12 +32,6 @@ public class LoginCommand extends Command {
       hash = TAuth.getHasher().hash(hash);
       response = TAuth.getManager().login(player, hash);
       Checker.display(player, response);
-
-      if (response == LoginResponse.OK) {
-        Main.getServer()
-          .getPluginManager()
-          .callEvent(new TLoginEvent(Main.getServer().getPlayer(player), false));
-      }
     }
   }
 }
