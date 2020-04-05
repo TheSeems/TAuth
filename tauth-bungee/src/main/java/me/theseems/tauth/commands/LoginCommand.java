@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class LoginCommand extends Command {
   public LoginCommand() {
-    super("login");
+    super("login", "", "l", "log");
   }
 
   @Override
@@ -37,7 +37,7 @@ public class LoginCommand extends Command {
       if (response == LoginResponse.OK) {
         Main.getServer()
           .getPluginManager()
-          .callEvent(new TLoginEvent(Main.getServer().getPlayer(player), false));
+          .callEvent(new TLoginEvent(Main.getServer().getPlayer(player), false, null));
       }
     }
   }

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class RegisterCommand extends Command {
   public RegisterCommand() {
-    super("register");
+    super("register", "", "reg");
   }
 
   @Override
@@ -22,10 +22,7 @@ public class RegisterCommand extends Command {
       return;
     }
 
-    if (strings.length < 2) {
-      commandSender.sendMessage(
-        new TextComponent(Main.getBungeeSettings().getMessage("register.usage")));
-    } else if (!strings[0].equals(strings[1])) {
+    if (strings.length >= 2 && !strings[0].equals(strings[1])) {
       commandSender.sendMessage(
         new TextComponent(Main.getBungeeSettings().getMessage("register.no_match")));
     } else {
@@ -36,7 +33,7 @@ public class RegisterCommand extends Command {
       if (registerResponse == RegisterResponse.OK) {
         Main.getServer()
           .getPluginManager()
-          .callEvent(new TLoginEvent(Main.getServer().getPlayer(player), false));
+          .callEvent(new TLoginEvent(Main.getServer().getPlayer(player), false, null));
         Checker.display(player, registerResponse);
       }
     }

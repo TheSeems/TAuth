@@ -14,6 +14,8 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static me.theseems.tauth.Main.debug;
@@ -35,13 +37,13 @@ public class LoginTeleportListener implements Listener {
 
   @EventHandler(priority = Byte.MAX_VALUE)
   public void on(ChatEvent e) {
+    List<String> allowed = Arrays.asList("/register", "/login", "/l", "/log", "/reg");
     if (e.getSender() instanceof ProxiedPlayer) {
       LoginResponse response =
         TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
       if (response != LoginResponse.OK) {
         boolean shouldCancel =
-          !(e.isCommand()
-            && (e.getMessage().startsWith("/register") || e.getMessage().startsWith("/login")));
+          !(e.isCommand() && allowed.stream().anyMatch((a) -> e.getMessage().startsWith(a)));
         if (shouldCancel) {
           ((ProxiedPlayer) e.getSender())
             .sendMessage(

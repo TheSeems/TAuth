@@ -22,7 +22,7 @@ public class JoinListener implements Listener {
       && TAuth.getManager().isAutheticated(player) == LoginResponse.OK) {
       debug("Auto logined " + player);
       Checker.display(player, LoginResponse.OK);
-      Main.getServer().getPluginManager().callEvent(new TLoginEvent(e.getPlayer(), true));
+      Main.getServer().getPluginManager().callEvent(new TLoginEvent(e.getPlayer(), true, e));
     }
   }
 }
