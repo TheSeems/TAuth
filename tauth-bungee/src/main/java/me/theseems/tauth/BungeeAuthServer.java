@@ -55,8 +55,8 @@ public class BungeeAuthServer implements AuthServer, Runnable {
               } else {
                 online.put(s, serverPing.getPlayers().getOnline());
               }
-                });
+            });
         }
-        });
+      });
   }
 }
