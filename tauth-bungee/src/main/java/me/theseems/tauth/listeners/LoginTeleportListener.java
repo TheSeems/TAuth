@@ -4,6 +4,7 @@ import me.theseems.tauth.Checker;
 import me.theseems.tauth.LoginResponse;
 import me.theseems.tauth.Main;
 import me.theseems.tauth.TAuth;
+import me.theseems.tauth.events.TLoginEvent;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -22,6 +23,10 @@ import static me.theseems.tauth.Main.debug;
 
 public class LoginTeleportListener implements Listener {
 
+  private boolean checkNick(String nick) {
+    return nick.matches("^[a-zA-Z]\\w*$");
+  }
+
   @EventHandler(priority = Byte.MAX_VALUE)
   public void onPermissionEvent(PermissionCheckEvent e) {
     if (!(e.getSender() instanceof ProxiedPlayer)) {
@@ -29,7 +34,7 @@ public class LoginTeleportListener implements Listener {
     }
 
     LoginResponse response =
-      TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
+        TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
     if (response != LoginResponse.OK) {
       e.setHasPermission(false);
     }
@@ -40,63 +45,58 @@ public class LoginTeleportListener implements Listener {
     List<String> allowed = Arrays.asList("/register", "/login", "/l", "/log", "/reg");
     if (e.getSender() instanceof ProxiedPlayer) {
       LoginResponse response =
-        TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
+          TAuth.getManager().isAutheticated(((ProxiedPlayer) e.getSender()).getUniqueId());
       if (response != LoginResponse.OK) {
         boolean shouldCancel =
-          !(e.isCommand() && allowed.stream().anyMatch((a) -> e.getMessage().startsWith(a)));
+            !(e.isCommand() && allowed.stream().anyMatch((a) -> e.getMessage().startsWith(a)));
         if (shouldCancel) {
           ((ProxiedPlayer) e.getSender())
-            .sendMessage(
-              ChatMessageType.ACTION_BAR,
-              new TextComponent(Main.getBungeeSettings().getMessage("on.command")));
+              .sendMessage(
+                  ChatMessageType.ACTION_BAR,
+                  new TextComponent(Main.getBungeeSettings().getMessage("on.command")));
           e.setCancelled(true);
         }
       }
     }
   }
 
-  @EventHandler(priority = Byte.MAX_VALUE)
+  @EventHandler
   public void onLogin(ServerConnectEvent e) {
+    if (e.isCancelled())
+      return;
+
     UUID player = e.getPlayer().getUniqueId();
+    if (!checkNick(e.getPlayer().getName())) {
+      e.setCancelled(true);
+      e.getPlayer().disconnect(new TextComponent("§7Недопустимый ник"));
+      return;
+    }
+
+    if (e.getReason().equals(ServerConnectEvent.Reason.JOIN_PROXY)
+            && TAuth.getManager().isAutheticated(player) == LoginResponse.OK) {
+      debug("Auto logined " + player);
+      Main.getServer().getPluginManager().callEvent(new TLoginEvent(e.getPlayer(), true, e));
+      return;
+    }
+
     boolean joinAuth = TAuth.getSettings().getAuthServers().contains(e.getTarget().getName());
     LoginResponse response = TAuth.getManager().isAutheticated(player);
 
     debug(
-      e.getPlayer().getUniqueId()
-        + " to "
-        + e.getTarget().getName()
-        + " with "
-        + response
-        + " (JA = "
-        + joinAuth
-        + ")");
+        e.getPlayer().getUniqueId()
+            + " to "
+            + e.getTarget().getName()
+            + " with "
+            + response
+            + " (JA = "
+            + joinAuth
+            + ")");
 
     if (response != LoginResponse.OK) {
-      Checker.display(player, TAuth.getManager().isAutheticated(player));
-
-      if (e.getPlayer().getServer() == null)
-        e.setTarget(Main.getServer().getServerInfo(TAuth.getAuthBalancer().getServer(player)));
-      else e.setCancelled(!joinAuth);
-
-    } else if (!(Main.getBungeeSettings().getDebug() && e.getPlayer().hasPermission("tauth.admin"))
-      && joinAuth) {
-
-      ServerInfo to = Main.getServer().getServerInfo(TAuth.getNextBalancer().getServer(player));
-      debug(
-        "Balancer choose as next "
-          + e.toString()
-          + " for "
-          + e.getPlayer().getName()
-          + " ("
-          + player
-          + ")");
-
-      ServerInfo current =
-        e.getPlayer().getServer() == null ? null : e.getPlayer().getServer().getInfo();
-      debug("[LTL] connecting to " + to);
-
-      if (current == null || !to.getName().equals(current.getName())) e.setTarget(to);
-      else e.setCancelled(true);
+      ServerInfo info = Main.getServer().getServerInfo(TAuth.getAuthBalancer().getServer(player));
+      System.out.println("Connecting to the auth " + info.getName());
+      if (!info.equals(e.getTarget()))
+        e.setTarget(info);
     }
   }
 }

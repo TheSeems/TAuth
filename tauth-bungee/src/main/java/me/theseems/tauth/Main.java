@@ -7,7 +7,6 @@ import me.theseems.tauth.config.BungeeSettings;
 import me.theseems.tauth.config.YamlSettings;
 import me.theseems.tauth.db.JDBCDb;
 import me.theseems.tauth.db.MemoDb;
-import me.theseems.tauth.listeners.JoinListener;
 import me.theseems.tauth.listeners.LoginTeleportListener;
 import me.theseems.tauth.listeners.NextServerListener;
 import me.theseems.tauth.utils.Utils;
@@ -129,7 +128,6 @@ public class Main extends Plugin {
 
     getProxy().getPluginManager().registerListener(this, new LoginTeleportListener());
     getProxy().getPluginManager().registerListener(this, new NextServerListener());
-    getProxy().getPluginManager().registerListener(this, new JoinListener());
 
     getProxy().getPluginManager().registerCommand(this, new LoginCommand());
     getProxy().getPluginManager().registerCommand(this, new RegisterCommand());

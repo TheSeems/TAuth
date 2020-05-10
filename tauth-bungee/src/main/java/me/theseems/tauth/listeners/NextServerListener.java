@@ -37,9 +37,15 @@ public class NextServerListener implements Listener {
         + ") => "
         + info.getName());
 
-    if (current == null || !current.equals(info.getName())) {
-      if (e.getEvent() != null) e.getEvent().setTarget(info);
-      else e.getPlayer().connect(info);
+    debug("Current = " + (e.getPlayer().getServer() == null ? "null" : e.getPlayer().getServer().getInfo().getName()) +  " need = " + info.getName());
+
+    if (e.getEvent() == null) {
+      System.out.println("Null event");
+      e.getPlayer().connect(info);
+    } else {
+      System.out.println("Setting " + info);
+      e.getEvent().setCancelled(false);
+      e.getEvent().setTarget(info);
     }
   }
 }
